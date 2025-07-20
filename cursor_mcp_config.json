@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "selenium-mcp": {
+      "command": "python",
+      "args": ["./mcp_server.py"],
+      "cwd": "PUT_YOUR_PROJECT_PATH_HERE",
+      "env": {
+        "PYTHONPATH": "PUT_YOUR_PROJECT_PATH_HERE"
+      }
+    }
+  }
+}
