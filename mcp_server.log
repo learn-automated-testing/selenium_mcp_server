@@ -1288,3 +1288,700 @@ Stacktrace:
 2025-07-21 06:04:34,451 - __main__ - INFO - 📦 Created browser context
 2025-07-21 06:04:38,543 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
 2025-07-21 06:04:38,547 - __main__ - INFO - 🛠️ Executing tool: generate_script
+2025-07-21 06:42:25,287 - __main__ - INFO - 🚀 Successfully loaded 32 tools
+2025-07-21 06:42:25,287 - __main__ - INFO -   1. navigate_to
+2025-07-21 06:42:25,287 - __main__ - INFO -   2. go_back
+2025-07-21 06:42:25,287 - __main__ - INFO -   3. go_forward
+2025-07-21 06:42:25,287 - __main__ - INFO -   4. capture_page
+2025-07-21 06:42:25,287 - __main__ - INFO -   5. click_element
+2025-07-21 06:42:25,287 - __main__ - INFO -   ... and 27 more tools
+2025-07-21 06:42:25,287 - __main__ - INFO - 🚀 Initializing Selenium MCP Server with 32 tools
+2025-07-21 06:42:25,287 - __main__ - INFO - 🚀 Starting Selenium MCP Server
+2025-07-21 06:42:25,288 - __main__ - INFO - 📋 Available tools: 32
+2025-07-21 06:42:25,288 - __main__ - INFO -   1. navigate_to: Navigate to a URL
+2025-07-21 06:42:25,288 - __main__ - INFO -   2. go_back: Go back to the previous page
+2025-07-21 06:42:25,288 - __main__ - INFO -   3. go_forward: Go forward to the next page
+2025-07-21 06:42:25,288 - __main__ - INFO -   4. capture_page: Capture DOM snapshot of the current page for element analysis
+2025-07-21 06:42:25,288 - __main__ - INFO -   5. click_element: Click on an element using its reference from page snapshot
+2025-07-21 06:42:25,288 - __main__ - INFO -   ... and 27 more tools
+2025-07-21 06:42:25,293 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 06:42:25,293 - __main__ - INFO - 📋 Listing 32 tools
+2025-07-21 06:42:25,298 - __main__ - INFO - 📋 Successfully returning 32 tools
+2025-07-21 06:42:29,542 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 06:42:29,542 - __main__ - INFO - 📋 Listing 32 tools
+2025-07-21 06:42:29,546 - __main__ - INFO - 📋 Successfully returning 32 tools
+2025-07-21 06:43:17,243 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:43:17,243 - __main__ - INFO - 🛠️ Executing tool: start_recording
+2025-07-21 06:43:17,243 - __main__ - INFO - 📦 Created browser context
+2025-07-21 06:43:20,684 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:43:20,684 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 06:43:20,685 - selenium_mcp.context - INFO - 📹 Recorded action: navigate_to
+2025-07-21 06:43:20,714 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 06:43:20,841 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:43:20,926 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:43:21,008 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 06:43:53,673 - selenium_mcp.context - ERROR - ❌ Failed to initialize browser: Message: Can not connect to the Service /Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver
+
+2025-07-21 06:43:53,674 - selenium_mcp.context - INFO - 🔄 Trying alternative browser initialization...
+2025-07-21 06:43:54,342 - selenium_mcp.context - INFO - 🌐 Browser initialized (alternative method)
+2025-07-21 06:44:54,352 - selenium.webdriver.common.service - ERROR - Service process refused to terminate gracefully with SIGTERM, escalating to SIGKILL.
+Traceback (most recent call last):
+  File "/Users/r.vanderhorst/develop/selenium_mcp_server/venv/lib/python3.13/site-packages/selenium/webdriver/common/service.py", line 179, in _terminate_process
+    self.process.wait(60)
+    ~~~~~~~~~~~~~~~~~^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 2058, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver', '--port=54751']' timed out after 60 seconds
+2025-07-21 06:44:54,358 - selenium_mcp.context - ERROR - ❌ Tool execution failed: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+0   chromedriver                        0x0000000100f4f55c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x0000000100f47454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x0000000100a963f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x0000000100a7fdc8 chromedriver + 196040
+4   chromedriver                        0x0000000100aa2f14 cxxbridge1$string$len + 142660
+5   chromedriver                        0x0000000100b059bc cxxbridge1$string$len + 546796
+6   chromedriver                        0x0000000100b1e638 cxxbridge1$string$len + 648296
+7   chromedriver                        0x0000000100ad1a0c cxxbridge1$string$len + 333884
+8   chromedriver                        0x0000000100f125e0 cxxbridge1$str$ptr + 2481340
+9   chromedriver                        0x0000000100f15848 cxxbridge1$str$ptr + 2494244
+10  chromedriver                        0x0000000100ef3234 cxxbridge1$str$ptr + 2353424
+11  chromedriver                        0x0000000100f16104 cxxbridge1$str$ptr + 2496480
+12  chromedriver                        0x0000000100ee42e4 cxxbridge1$str$ptr + 2292160
+13  chromedriver                        0x0000000100f35ff8 cxxbridge1$str$ptr + 2627284
+14  chromedriver                        0x0000000100f36184 cxxbridge1$str$ptr + 2627680
+15  chromedriver                        0x0000000100f47090 cxxbridge1$str$ptr + 2697068
+16  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+17  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 06:45:01,224 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:45:01,225 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 06:45:01,225 - selenium_mcp.context - INFO - 📹 Recorded action: navigate_to
+2025-07-21 06:45:01,226 - selenium_mcp.context - WARNING - ⚠️ Browser session invalid, creating new one...
+2025-07-21 06:45:01,226 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 06:45:01,352 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:45:01,439 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:45:01,506 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 06:45:34,189 - selenium_mcp.context - ERROR - ❌ Failed to initialize browser: Message: Can not connect to the Service /Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver
+
+2025-07-21 06:45:34,189 - selenium_mcp.context - INFO - 🔄 Trying alternative browser initialization...
+2025-07-21 06:45:34,805 - selenium_mcp.context - INFO - 🌐 Browser initialized (alternative method)
+2025-07-21 06:46:34,811 - selenium.webdriver.common.service - ERROR - Service process refused to terminate gracefully with SIGTERM, escalating to SIGKILL.
+Traceback (most recent call last):
+  File "/Users/r.vanderhorst/develop/selenium_mcp_server/venv/lib/python3.13/site-packages/selenium/webdriver/common/service.py", line 179, in _terminate_process
+    self.process.wait(60)
+    ~~~~~~~~~~~~~~~~~^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 2058, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver', '--port=55559']' timed out after 60 seconds
+2025-07-21 06:46:34,814 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.parkos.nl
+2025-07-21 06:46:34,815 - selenium_mcp.context - WARNING - ⚠️ Browser session invalid, creating new one...
+2025-07-21 06:46:34,815 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 06:46:34,943 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:46:35,024 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:46:35,110 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 06:47:07,783 - selenium_mcp.context - ERROR - ❌ Failed to initialize browser: Message: Can not connect to the Service /Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver
+
+2025-07-21 06:47:07,783 - selenium_mcp.context - INFO - 🔄 Trying alternative browser initialization...
+2025-07-21 06:47:08,342 - selenium_mcp.context - INFO - 🌐 Browser initialized (alternative method)
+2025-07-21 06:47:55,886 - __main__ - INFO - 🚀 Successfully loaded 32 tools
+2025-07-21 06:47:55,886 - __main__ - INFO -   1. navigate_to
+2025-07-21 06:47:55,886 - __main__ - INFO -   2. go_back
+2025-07-21 06:47:55,886 - __main__ - INFO -   3. go_forward
+2025-07-21 06:47:55,886 - __main__ - INFO -   4. capture_page
+2025-07-21 06:47:55,886 - __main__ - INFO -   5. click_element
+2025-07-21 06:47:55,886 - __main__ - INFO -   ... and 27 more tools
+2025-07-21 06:47:55,886 - __main__ - INFO - 🚀 Initializing Selenium MCP Server with 32 tools
+2025-07-21 06:47:55,886 - __main__ - INFO - 🚀 Starting Selenium MCP Server
+2025-07-21 06:47:55,886 - __main__ - INFO - 📋 Available tools: 32
+2025-07-21 06:47:55,886 - __main__ - INFO -   1. navigate_to: Navigate to a URL
+2025-07-21 06:47:55,886 - __main__ - INFO -   2. go_back: Go back to the previous page
+2025-07-21 06:47:55,886 - __main__ - INFO -   3. go_forward: Go forward to the next page
+2025-07-21 06:47:55,886 - __main__ - INFO -   4. capture_page: Capture DOM snapshot of the current page for element analysis
+2025-07-21 06:47:55,886 - __main__ - INFO -   5. click_element: Click on an element using its reference from page snapshot
+2025-07-21 06:47:55,886 - __main__ - INFO -   ... and 27 more tools
+2025-07-21 06:47:55,891 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 06:47:55,891 - __main__ - INFO - 📋 Listing 32 tools
+2025-07-21 06:47:55,897 - __main__ - INFO - 📋 Successfully returning 32 tools
+2025-07-21 06:48:15,436 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:48:15,436 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 06:48:15,437 - __main__ - INFO - 📦 Created browser context
+2025-07-21 06:48:15,463 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 06:48:15,582 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:48:15,669 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:48:15,756 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 06:48:48,416 - selenium_mcp.context - ERROR - ❌ Failed to initialize browser: Message: Can not connect to the Service /Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver
+
+2025-07-21 06:48:48,416 - selenium_mcp.context - INFO - 🔄 Trying alternative browser initialization...
+2025-07-21 06:48:49,026 - selenium_mcp.context - INFO - 🌐 Browser initialized (alternative method)
+2025-07-21 06:49:49,039 - selenium.webdriver.common.service - ERROR - Service process refused to terminate gracefully with SIGTERM, escalating to SIGKILL.
+Traceback (most recent call last):
+  File "/Users/r.vanderhorst/develop/selenium_mcp_server/venv/lib/python3.13/site-packages/selenium/webdriver/common/service.py", line 179, in _terminate_process
+    self.process.wait(60)
+    ~~~~~~~~~~~~~~~~~^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 2058, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver', '--port=57277']' timed out after 60 seconds
+2025-07-21 06:49:51,616 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.parkos.nl
+2025-07-21 06:50:02,877 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:50:02,878 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 06:50:03,345 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.parkos.nl
+2025-07-21 06:50:16,112 - __main__ - INFO - 🚀 Successfully loaded 32 tools
+2025-07-21 06:50:16,112 - __main__ - INFO -   1. navigate_to
+2025-07-21 06:50:16,112 - __main__ - INFO -   2. go_back
+2025-07-21 06:50:16,112 - __main__ - INFO -   3. go_forward
+2025-07-21 06:50:16,112 - __main__ - INFO -   4. capture_page
+2025-07-21 06:50:16,112 - __main__ - INFO -   5. click_element
+2025-07-21 06:50:16,112 - __main__ - INFO -   ... and 27 more tools
+2025-07-21 06:50:16,112 - __main__ - INFO - 🚀 Initializing Selenium MCP Server with 32 tools
+2025-07-21 06:50:16,113 - __main__ - INFO - 🚀 Starting Selenium MCP Server
+2025-07-21 06:50:16,113 - __main__ - INFO - 📋 Available tools: 32
+2025-07-21 06:50:16,113 - __main__ - INFO -   1. navigate_to: Navigate to a URL
+2025-07-21 06:50:16,113 - __main__ - INFO -   2. go_back: Go back to the previous page
+2025-07-21 06:50:16,113 - __main__ - INFO -   3. go_forward: Go forward to the next page
+2025-07-21 06:50:16,113 - __main__ - INFO -   4. capture_page: Capture DOM snapshot of the current page for element analysis
+2025-07-21 06:50:16,113 - __main__ - INFO -   5. click_element: Click on an element using its reference from page snapshot
+2025-07-21 06:50:16,113 - __main__ - INFO -   ... and 27 more tools
+2025-07-21 06:50:16,120 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 06:50:16,120 - __main__ - INFO - 📋 Listing 32 tools
+2025-07-21 06:50:16,125 - __main__ - INFO - 📋 Successfully returning 32 tools
+2025-07-21 06:50:16,126 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 06:50:16,126 - __main__ - INFO - 📋 Listing 32 tools
+2025-07-21 06:50:16,130 - __main__ - INFO - 📋 Successfully returning 32 tools
+2025-07-21 06:50:35,835 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:50:35,837 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 06:50:35,837 - __main__ - INFO - 📦 Created browser context
+2025-07-21 06:50:35,837 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.parkos.nl'
+2025-07-21 06:50:35,877 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 06:50:36,000 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:50:36,082 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:50:36,169 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 06:50:36,184 - selenium_mcp.context - ERROR - ❌ Failed to initialize browser: Message: Service /Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver unexpectedly exited. Status code was: -9
+
+2025-07-21 06:50:36,184 - selenium_mcp.context - INFO - 🔄 Trying alternative browser initialization...
+2025-07-21 06:50:37,115 - selenium_mcp.context - INFO - 🌐 Browser initialized (alternative method)
+2025-07-21 06:50:39,883 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.parkos.nl
+2025-07-21 06:54:44,816 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPConnectionPool(host='localhost', port=58385): Read timed out. (read timeout=120)")': /session/50066a7e5a9edfbd7a86ed266f6d3c24/element/f.5823CF4BCAFF624EFF42DDFCF8B84E71.d.63031A94D1AB4C35BC108249252934CB.e.566/name
+2025-07-21 06:56:44,819 - urllib3.connectionpool - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPConnectionPool(host='localhost', port=58385): Read timed out. (read timeout=120)")': /session/50066a7e5a9edfbd7a86ed266f6d3c24/element/f.5823CF4BCAFF624EFF42DDFCF8B84E71.d.63031A94D1AB4C35BC108249252934CB.e.566/name
+2025-07-21 06:57:13,119 - __main__ - INFO - 🚀 Successfully loaded 33 tools
+2025-07-21 06:57:13,119 - __main__ - INFO -   1. navigate_to
+2025-07-21 06:57:13,119 - __main__ - INFO -   2. go_back
+2025-07-21 06:57:13,119 - __main__ - INFO -   3. go_forward
+2025-07-21 06:57:13,119 - __main__ - INFO -   4. capture_page
+2025-07-21 06:57:13,119 - __main__ - INFO -   5. click_element
+2025-07-21 06:57:13,119 - __main__ - INFO -   ... and 28 more tools
+2025-07-21 06:57:13,120 - __main__ - INFO - 🚀 Initializing Selenium MCP Server with 33 tools
+2025-07-21 06:57:13,120 - __main__ - INFO - 🚀 Starting Selenium MCP Server
+2025-07-21 06:57:13,120 - __main__ - INFO - 📋 Available tools: 33
+2025-07-21 06:57:13,120 - __main__ - INFO -   1. navigate_to: Navigate to a URL
+2025-07-21 06:57:13,120 - __main__ - INFO -   2. go_back: Go back to the previous page
+2025-07-21 06:57:13,120 - __main__ - INFO -   3. go_forward: Go forward to the next page
+2025-07-21 06:57:13,120 - __main__ - INFO -   4. capture_page: Capture DOM snapshot of the current page for element analysis
+2025-07-21 06:57:13,120 - __main__ - INFO -   5. click_element: Click on an element using its reference from page snapshot
+2025-07-21 06:57:13,120 - __main__ - INFO -   ... and 28 more tools
+2025-07-21 06:57:13,124 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 06:57:13,124 - __main__ - INFO - 📋 Listing 33 tools
+2025-07-21 06:57:13,129 - __main__ - INFO - 📋 Successfully returning 33 tools
+2025-07-21 06:57:36,304 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:57:36,305 - __main__ - INFO - 🛠️ Executing tool: reset_automation_session
+2025-07-21 06:57:36,305 - __main__ - INFO - 📦 Created browser context
+2025-07-21 06:57:36,305 - selenium_mcp.tools.reset_session - INFO - 🔄 Force resetting automation browser session...
+2025-07-21 06:57:36,360 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 25631
+2025-07-21 06:57:36,363 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 25635
+2025-07-21 06:57:36,366 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 25636
+2025-07-21 06:57:36,369 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 25637
+2025-07-21 06:57:36,373 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 25638
+2025-07-21 06:57:36,377 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 44404
+2025-07-21 06:57:36,380 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 67844
+2025-07-21 06:57:36,388 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 67845
+2025-07-21 06:57:36,393 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 71883
+2025-07-21 06:57:36,396 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 71884
+2025-07-21 06:57:36,401 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 71887
+2025-07-21 06:57:36,404 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 71892
+2025-07-21 06:57:36,408 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 71893
+2025-07-21 06:57:36,412 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 71894
+2025-07-21 06:57:36,416 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 82162
+2025-07-21 06:57:36,419 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 82168
+2025-07-21 06:57:36,422 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 82169
+2025-07-21 06:57:36,426 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 82170
+2025-07-21 06:57:36,428 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 82171
+2025-07-21 06:57:36,432 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 82483
+2025-07-21 06:57:36,436 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 82484
+2025-07-21 06:57:36,439 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 83455
+2025-07-21 06:57:36,445 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 83461
+2025-07-21 06:57:36,454 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 83462
+2025-07-21 06:57:36,460 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 83463
+2025-07-21 06:57:36,467 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 83464
+2025-07-21 06:57:36,470 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 83473
+2025-07-21 06:57:36,473 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 83474
+2025-07-21 06:57:36,478 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 84315
+2025-07-21 06:57:36,488 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 84316
+2025-07-21 06:57:36,492 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation Chrome process 84317
+2025-07-21 06:57:36,492 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation browser processes only
+2025-07-21 06:57:36,492 - selenium_mcp.tools.reset_session - INFO - ✅ Cleared automation context state
+2025-07-21 06:57:41,328 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:57:41,330 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 06:57:41,330 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.parkos.nl'
+2025-07-21 06:57:41,372 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 06:57:41,501 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:57:41,582 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 06:57:41,673 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 06:57:42,375 - selenium_mcp.context - INFO - 🌐 Browser initialized
+2025-07-21 06:57:42,761 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.parkos.nl
+2025-07-21 06:58:20,315 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:58:20,316 - __main__ - INFO - 🛠️ Executing tool: start_recording
+2025-07-21 06:58:28,040 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:58:28,040 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 06:58:28,041 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 06:58:58,741 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 12 elements
+2025-07-21 06:59:36,058 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 06:59:36,060 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 06:59:36,061 - selenium_mcp.context - INFO - 📹 Recorded action: click_element
+2025-07-21 06:59:36,061 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Accept All cookies button', ref='e9'
+2025-07-21 06:59:36,119 - selenium_mcp.tools.snapshot - INFO - 🖱️ Clicked: Accept All cookies button
+2025-07-21 07:00:45,780 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:00:45,780 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:00:45,780 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:01:20,721 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 73 elements
+2025-07-21 07:01:28,361 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:01:28,363 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 07:01:28,363 - selenium_mcp.context - INFO - 📹 Recorded action: click_element
+2025-07-21 07:01:28,363 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Schiphol Airport link', ref='e23'
+2025-07-21 07:01:28,380 - selenium_mcp.context - ERROR - ❌ Tool execution failed: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[contains(text(), "Schiphol Airport
+vanaf € 57,00 per week")]"}
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+0   chromedriver                        0x0000000104edf55c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x0000000104ed7454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x0000000104a263f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x0000000104a6d71c cxxbridge1$string$len + 382284
+4   chromedriver                        0x0000000104aaeb1c cxxbridge1$string$len + 649548
+5   chromedriver                        0x0000000104a61a0c cxxbridge1$string$len + 333884
+6   chromedriver                        0x0000000104ea25e0 cxxbridge1$str$ptr + 2481340
+7   chromedriver                        0x0000000104ea5848 cxxbridge1$str$ptr + 2494244
+8   chromedriver                        0x0000000104e83234 cxxbridge1$str$ptr + 2353424
+9   chromedriver                        0x0000000104ea6104 cxxbridge1$str$ptr + 2496480
+10  chromedriver                        0x0000000104e742e4 cxxbridge1$str$ptr + 2292160
+11  chromedriver                        0x0000000104ec5ff8 cxxbridge1$str$ptr + 2627284
+12  chromedriver                        0x0000000104ec6184 cxxbridge1$str$ptr + 2627680
+13  chromedriver                        0x0000000104ed7090 cxxbridge1$str$ptr + 2697068
+14  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 07:01:50,749 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:01:50,750 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 07:01:50,750 - selenium_mcp.context - INFO - 📹 Recorded action: click_element
+2025-07-21 07:01:50,750 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Schiphol Airport link', ref='e56'
+2025-07-21 07:01:51,801 - selenium_mcp.tools.snapshot - WARNING - ⚠️ Standard click failed: Message: element click intercepted: Element is not clickable at point (660, 7796)
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementclickinterceptedexception
+Stacktrace:
+0   chromedriver                        0x0000000104edf55c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x0000000104ed7454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x0000000104a263f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x0000000104a73280 cxxbridge1$string$len + 405680
+4   chromedriver                        0x0000000104a717ec cxxbridge1$string$len + 398876
+5   chromedriver                        0x0000000104a6f600 cxxbridge1$string$len + 390192
+6   chromedriver                        0x0000000104a6e9fc cxxbridge1$string$len + 387116
+7   chromedriver                        0x0000000104a63530 cxxbridge1$string$len + 340832
+8   chromedriver                        0x0000000104a62fbc cxxbridge1$string$len + 339436
+9   chromedriver                        0x0000000104aaeb1c cxxbridge1$string$len + 649548
+10  chromedriver                        0x0000000104a61a0c cxxbridge1$string$len + 333884
+11  chromedriver                        0x0000000104ea25e0 cxxbridge1$str$ptr + 2481340
+12  chromedriver                        0x0000000104ea5848 cxxbridge1$str$ptr + 2494244
+13  chromedriver                        0x0000000104e83234 cxxbridge1$str$ptr + 2353424
+14  chromedriver                        0x0000000104ea6104 cxxbridge1$str$ptr + 2496480
+15  chromedriver                        0x0000000104e742e4 cxxbridge1$str$ptr + 2292160
+16  chromedriver                        0x0000000104ec5ff8 cxxbridge1$str$ptr + 2627284
+17  chromedriver                        0x0000000104ec6184 cxxbridge1$str$ptr + 2627680
+18  chromedriver                        0x0000000104ed7090 cxxbridge1$str$ptr + 2697068
+19  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+20  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 07:01:51,801 - selenium_mcp.tools.snapshot - INFO - 🔄 Trying JavaScript click fallback...
+2025-07-21 07:01:53,181 - selenium_mcp.tools.snapshot - INFO - ✅ JavaScript click successful: Schiphol Airport link
+2025-07-21 07:02:27,820 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:02:27,822 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:02:27,822 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:02:45,352 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 100 elements
+2025-07-21 07:03:05,991 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:03:05,992 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 07:03:05,992 - selenium_mcp.context - INFO - 📹 Recorded action: click_element
+2025-07-21 07:03:05,992 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Zoek een parkeerplek button', ref='e14'
+2025-07-21 07:03:08,333 - selenium_mcp.tools.snapshot - INFO - 🖱️ Clicked: Zoek een parkeerplek button
+2025-07-21 07:04:16,779 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:04:16,779 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:04:16,779 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:05:19,081 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 42 elements
+2025-07-21 07:05:35,985 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:05:35,986 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:05:35,986 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:06:37,724 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 42 elements
+2025-07-21 07:07:05,215 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:07:05,216 - __main__ - INFO - 🛠️ Executing tool: wait_for
+2025-07-21 07:07:05,216 - selenium_mcp.context - INFO - 📹 Recorded action: wait_for
+2025-07-21 07:07:08,224 - selenium_mcp.tools.wait - INFO - ⏱️ Waited for 3.0 seconds
+2025-07-21 07:07:11,663 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:07:11,664 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:07:11,665 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:08:14,812 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 42 elements
+2025-07-21 07:08:28,677 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:08:28,677 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:08:28,677 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:09:23,620 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 42 elements
+2025-07-21 07:09:44,470 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:09:44,470 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:09:44,470 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:10:48,065 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 42 elements
+2025-07-21 07:11:13,637 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:11:13,640 - __main__ - INFO - 🛠️ Executing tool: javascript_execute
+2025-07-21 07:11:13,640 - selenium_mcp.context - INFO - 📹 Recorded action: javascript_execute
+2025-07-21 07:11:13,654 - selenium_mcp.tools.javascript - INFO - 🟡 Executed JavaScript: window.scrollTo(0, document.body.scrollHeight);...
+2025-07-21 07:12:19,246 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:12:19,247 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 07:12:19,247 - selenium_mcp.context - INFO - 📹 Recorded action: capture_page
+2025-07-21 07:13:03,155 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 42 elements
+2025-07-21 07:13:36,954 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 07:13:36,955 - __main__ - INFO - 🛠️ Executing tool: javascript_execute
+2025-07-21 07:13:36,955 - selenium_mcp.context - INFO - 📹 Recorded action: javascript_execute
+2025-07-21 07:13:36,959 - selenium_mcp.tools.javascript - INFO - 🟡 Executed JavaScript: window.scrollTo(0, 300);...
+2025-07-21 08:42:18,594 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 08:42:18,597 - __main__ - INFO - 🛠️ Executing tool: reset_automation_session
+2025-07-21 08:42:18,597 - selenium_mcp.context - INFO - 📹 Recorded action: reset_automation_session
+2025-07-21 08:42:18,597 - selenium_mcp.tools.reset_session - INFO - 🔄 Force resetting automation browser session...
+2025-07-21 08:42:18,748 - selenium_mcp.tools.reset_session - INFO - ✅ Closed existing WebDriver session
+2025-07-21 08:42:18,787 - selenium_mcp.tools.reset_session - INFO - ✅ Killed automation browser processes only
+2025-07-21 08:42:18,787 - selenium_mcp.tools.reset_session - INFO - ✅ Cleared automation context state
+2025-07-21 08:42:38,889 - __main__ - INFO - 🚀 Successfully loaded 33 tools
+2025-07-21 08:42:38,889 - __main__ - INFO -   1. navigate_to
+2025-07-21 08:42:38,889 - __main__ - INFO -   2. go_back
+2025-07-21 08:42:38,889 - __main__ - INFO -   3. go_forward
+2025-07-21 08:42:38,889 - __main__ - INFO -   4. capture_page
+2025-07-21 08:42:38,889 - __main__ - INFO -   5. click_element
+2025-07-21 08:42:38,889 - __main__ - INFO -   ... and 28 more tools
+2025-07-21 08:42:38,889 - __main__ - INFO - 🚀 Initializing Selenium MCP Server with 33 tools
+2025-07-21 08:42:38,889 - __main__ - INFO - 🚀 Starting Selenium MCP Server
+2025-07-21 08:42:38,889 - __main__ - INFO - 📋 Available tools: 33
+2025-07-21 08:42:38,889 - __main__ - INFO -   1. navigate_to: Navigate to a URL
+2025-07-21 08:42:38,889 - __main__ - INFO -   2. go_back: Go back to the previous page
+2025-07-21 08:42:38,889 - __main__ - INFO -   3. go_forward: Go forward to the next page
+2025-07-21 08:42:38,889 - __main__ - INFO -   4. capture_page: Capture DOM snapshot of the current page for element analysis
+2025-07-21 08:42:38,889 - __main__ - INFO -   5. click_element: Click on an element using its reference from page snapshot
+2025-07-21 08:42:38,889 - __main__ - INFO -   ... and 28 more tools
+2025-07-21 08:42:38,897 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 08:42:38,897 - __main__ - INFO - 📋 Listing 33 tools
+2025-07-21 08:42:38,902 - __main__ - INFO - 📋 Successfully returning 33 tools
+2025-07-21 08:42:38,903 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 08:42:38,903 - __main__ - INFO - 📋 Listing 33 tools
+2025-07-21 08:42:38,906 - __main__ - INFO - 📋 Successfully returning 33 tools
+2025-07-21 08:43:46,307 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 08:43:46,310 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 08:43:46,310 - __main__ - INFO - 📦 Created browser context
+2025-07-21 08:43:46,310 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.parkos.nl'
+2025-07-21 08:43:46,346 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 08:43:46,528 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 08:43:46,649 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 08:43:46,730 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 08:43:47,724 - selenium_mcp.context - INFO - 🌐 Browser initialized
+2025-07-21 08:43:50,772 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.parkos.nl
+2025-07-21 08:44:32,741 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 08:44:32,743 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 08:44:32,743 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Alles toestaan button', ref='e9'
+2025-07-21 08:44:32,790 - selenium_mcp.tools.snapshot - INFO - 🖱️ Clicked: Alles toestaan button
+2025-07-21 08:46:29,080 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 08:46:29,081 - __main__ - INFO - 🛠️ Executing tool: recording_status
+2025-07-21 08:46:35,781 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 08:46:35,785 - __main__ - INFO - 🛠️ Executing tool: generate_script
+2025-07-21 08:47:06,067 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 08:47:06,069 - __main__ - INFO - 🛠️ Executing tool: generate_script
+2025-07-21 09:03:02,570 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:03:02,571 - __main__ - INFO - 🛠️ Executing tool: stop_recording
+2025-07-21 09:03:05,851 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:03:05,852 - __main__ - INFO - 🛠️ Executing tool: close_session
+2025-07-21 09:03:05,973 - selenium_mcp.context - INFO - 🚪 Browser closed
+2025-07-21 09:03:05,973 - selenium_mcp.tools.common - INFO - 🚪 Browser closed
+2025-07-21 09:18:21,161 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:18:21,164 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 09:18:21,164 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.bol.com'
+2025-07-21 09:18:21,164 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 09:18:21,353 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 09:18:21,450 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 09:18:21,528 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 09:18:22,823 - selenium_mcp.context - INFO - 🌐 Browser initialized
+2025-07-21 09:18:23,224 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.bol.com
+2025-07-21 09:19:14,019 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:19:14,020 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:19:33,767 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 41 elements
+2025-07-21 09:19:42,781 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:19:42,782 - __main__ - INFO - 🛠️ Executing tool: wait_for
+2025-07-21 09:19:45,790 - selenium_mcp.tools.wait - INFO - ⏱️ Waited for 3.0 seconds
+2025-07-21 09:19:48,032 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:19:48,033 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:20:05,786 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 41 elements
+2025-07-21 09:20:22,453 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:20:22,454 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 09:20:22,454 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.bol.com'
+2025-07-21 09:20:22,986 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.bol.com
+2025-07-21 09:20:39,432 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:20:39,433 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 09:20:39,433 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Alles accepteren button', ref='e39'
+2025-07-21 09:20:39,563 - selenium_mcp.tools.snapshot - INFO - 🖱️ Clicked: Alles accepteren button
+2025-07-21 09:21:29,373 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:21:29,374 - __main__ - INFO - 🛠️ Executing tool: input_text
+2025-07-21 09:21:29,469 - selenium_mcp.tools.keyboard - INFO - ⌨️ Typed 'feyenoord shirt' into Zoeken input field
+2025-07-21 09:22:20,991 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:22:20,992 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 09:22:20,992 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Zoeken button', ref='e8'
+2025-07-21 09:22:20,998 - selenium_mcp.context - ERROR - ❌ Tool execution failed: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//button[contains(text(), "Zoeken")]"}
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+0   chromedriver                        0x000000010330355c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x00000001032fb454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x0000000102e4a3f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x0000000102e9171c cxxbridge1$string$len + 382284
+4   chromedriver                        0x0000000102ed2b1c cxxbridge1$string$len + 649548
+5   chromedriver                        0x0000000102e85a0c cxxbridge1$string$len + 333884
+6   chromedriver                        0x00000001032c65e0 cxxbridge1$str$ptr + 2481340
+7   chromedriver                        0x00000001032c9848 cxxbridge1$str$ptr + 2494244
+8   chromedriver                        0x00000001032a7234 cxxbridge1$str$ptr + 2353424
+9   chromedriver                        0x00000001032ca104 cxxbridge1$str$ptr + 2496480
+10  chromedriver                        0x00000001032982e4 cxxbridge1$str$ptr + 2292160
+11  chromedriver                        0x00000001032e9ff8 cxxbridge1$str$ptr + 2627284
+12  chromedriver                        0x00000001032ea184 cxxbridge1$str$ptr + 2627680
+13  chromedriver                        0x00000001032fb090 cxxbridge1$str$ptr + 2697068
+14  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 09:22:25,106 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:22:25,106 - __main__ - INFO - 🛠️ Executing tool: key_press
+2025-07-21 09:22:25,117 - selenium_mcp.tools.keys - INFO - ⌨️ Pressed key: Enter
+2025-07-21 09:22:32,040 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:22:32,040 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:23:06,754 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 100 elements
+2025-07-21 09:23:21,708 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:23:21,709 - __main__ - INFO - 🛠️ Executing tool: wait_for
+2025-07-21 09:23:24,710 - selenium_mcp.tools.wait - INFO - ⏱️ Waited for 3.0 seconds
+2025-07-21 09:23:34,639 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:23:34,639 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:24:09,779 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 100 elements
+2025-07-21 09:24:20,674 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:24:20,675 - __main__ - INFO - 🛠️ Executing tool: generate_script
+2025-07-21 09:25:50,974 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:25:50,976 - __main__ - INFO - 🛠️ Executing tool: generate_script
+2025-07-21 09:31:06,728 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:31:06,730 - __main__ - INFO - 🛠️ Executing tool: close_session
+2025-07-21 09:31:06,838 - selenium_mcp.context - INFO - 🚪 Browser closed
+2025-07-21 09:31:06,839 - selenium_mcp.tools.common - INFO - 🚪 Browser closed
+2025-07-21 09:31:46,925 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:31:46,926 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 09:31:46,926 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.coolblue.nl'
+2025-07-21 09:31:46,926 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 09:31:47,122 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 09:31:47,199 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 09:31:47,285 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 09:31:48,563 - selenium_mcp.context - INFO - 🌐 Browser initialized
+2025-07-21 09:31:49,552 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.coolblue.nl
+2025-07-21 09:32:25,709 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:32:25,710 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:32:54,139 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 100 elements
+2025-07-21 09:33:03,939 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:33:03,940 - __main__ - INFO - 🛠️ Executing tool: javascript_execute
+2025-07-21 09:33:03,944 - selenium_mcp.tools.javascript - INFO - 🟡 Executed JavaScript: window.scrollTo(0, document.body.scrollHeight);...
+2025-07-21 09:34:06,181 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:34:06,181 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:34:34,251 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 100 elements
+2025-07-21 09:35:04,864 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:35:04,864 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:35:52,761 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 100 elements
+2025-07-21 09:35:56,996 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:35:56,997 - __main__ - INFO - 🛠️ Executing tool: javascript_execute
+2025-07-21 09:35:58,280 - selenium_mcp.tools.javascript - INFO - 🟡 Executed JavaScript: const buttons = Array.from(document.querySelectorAll('button'));
+const okeButton = buttons.find(butt...
+2025-07-21 09:50:44,451 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:50:44,453 - __main__ - INFO - 🛠️ Executing tool: input_text
+2025-07-21 09:50:44,463 - selenium_mcp.context - ERROR - ❌ Tool execution failed: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//button[contains(text(), "Inloggen")]"}
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+0   chromedriver                        0x00000001029e755c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x00000001029df454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x000000010252e3f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x000000010257571c cxxbridge1$string$len + 382284
+4   chromedriver                        0x00000001025b6b1c cxxbridge1$string$len + 649548
+5   chromedriver                        0x0000000102569a0c cxxbridge1$string$len + 333884
+6   chromedriver                        0x00000001029aa5e0 cxxbridge1$str$ptr + 2481340
+7   chromedriver                        0x00000001029ad848 cxxbridge1$str$ptr + 2494244
+8   chromedriver                        0x000000010298b234 cxxbridge1$str$ptr + 2353424
+9   chromedriver                        0x00000001029ae104 cxxbridge1$str$ptr + 2496480
+10  chromedriver                        0x000000010297c2e4 cxxbridge1$str$ptr + 2292160
+11  chromedriver                        0x00000001029cdff8 cxxbridge1$str$ptr + 2627284
+12  chromedriver                        0x00000001029ce184 cxxbridge1$str$ptr + 2627680
+13  chromedriver                        0x00000001029df090 cxxbridge1$str$ptr + 2697068
+14  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 09:50:56,885 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:50:56,885 - __main__ - INFO - 🛠️ Executing tool: capture_page
+2025-07-21 09:51:30,590 - selenium_mcp.tools.snapshot - INFO - 📸 Captured snapshot with 99 elements
+2025-07-21 09:51:33,886 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:51:33,888 - __main__ - INFO - 🛠️ Executing tool: input_text
+2025-07-21 09:51:33,896 - selenium_mcp.context - ERROR - ❌ Tool execution failed: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//button[contains(text(), "Zoeken")]"}
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+0   chromedriver                        0x00000001029e755c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x00000001029df454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x000000010252e3f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x000000010257571c cxxbridge1$string$len + 382284
+4   chromedriver                        0x00000001025b6b1c cxxbridge1$string$len + 649548
+5   chromedriver                        0x0000000102569a0c cxxbridge1$string$len + 333884
+6   chromedriver                        0x00000001029aa5e0 cxxbridge1$str$ptr + 2481340
+7   chromedriver                        0x00000001029ad848 cxxbridge1$str$ptr + 2494244
+8   chromedriver                        0x000000010298b234 cxxbridge1$str$ptr + 2353424
+9   chromedriver                        0x00000001029ae104 cxxbridge1$str$ptr + 2496480
+10  chromedriver                        0x000000010297c2e4 cxxbridge1$str$ptr + 2292160
+11  chromedriver                        0x00000001029cdff8 cxxbridge1$str$ptr + 2627284
+12  chromedriver                        0x00000001029ce184 cxxbridge1$str$ptr + 2627680
+13  chromedriver                        0x00000001029df090 cxxbridge1$str$ptr + 2697068
+14  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 09:51:38,947 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:51:38,949 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 09:51:38,949 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.coolblue.nl'
+2025-07-21 09:51:39,818 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.coolblue.nl
+2025-07-21 09:52:16,233 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:52:16,235 - __main__ - INFO - 🛠️ Executing tool: input_text
+2025-07-21 09:52:16,369 - selenium_mcp.tools.keyboard - INFO - ⌨️ Typed 'feyenoord shirt' into Zoeken naar producten input field
+2025-07-21 09:52:51,432 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:52:51,434 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 09:52:51,434 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Zoeken button', ref='e3'
+2025-07-21 09:52:51,439 - selenium_mcp.context - ERROR - ❌ Tool execution failed: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//button[contains(text(), "Zoeken")]"}
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+0   chromedriver                        0x00000001029e755c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x00000001029df454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x000000010252e3f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x000000010257571c cxxbridge1$string$len + 382284
+4   chromedriver                        0x00000001025b6b1c cxxbridge1$string$len + 649548
+5   chromedriver                        0x0000000102569a0c cxxbridge1$string$len + 333884
+6   chromedriver                        0x00000001029aa5e0 cxxbridge1$str$ptr + 2481340
+7   chromedriver                        0x00000001029ad848 cxxbridge1$str$ptr + 2494244
+8   chromedriver                        0x000000010298b234 cxxbridge1$str$ptr + 2353424
+9   chromedriver                        0x00000001029ae104 cxxbridge1$str$ptr + 2496480
+10  chromedriver                        0x000000010297c2e4 cxxbridge1$str$ptr + 2292160
+11  chromedriver                        0x00000001029cdff8 cxxbridge1$str$ptr + 2627284
+12  chromedriver                        0x00000001029ce184 cxxbridge1$str$ptr + 2627680
+13  chromedriver                        0x00000001029df090 cxxbridge1$str$ptr + 2697068
+14  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 09:52:56,952 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 09:52:56,954 - __main__ - INFO - 🛠️ Executing tool: key_press
+2025-07-21 09:52:57,840 - selenium_mcp.tools.keys - INFO - ⌨️ Pressed key: Enter
+2025-07-21 10:59:35,586 - __main__ - INFO - 🚀 Successfully loaded 33 tools
+2025-07-21 10:59:35,586 - __main__ - INFO -   1. navigate_to
+2025-07-21 10:59:35,586 - __main__ - INFO -   2. go_back
+2025-07-21 10:59:35,587 - __main__ - INFO -   3. go_forward
+2025-07-21 10:59:35,587 - __main__ - INFO -   4. capture_page
+2025-07-21 10:59:35,587 - __main__ - INFO -   5. click_element
+2025-07-21 10:59:35,587 - __main__ - INFO -   ... and 28 more tools
+2025-07-21 10:59:35,587 - __main__ - INFO - 🚀 Initializing Selenium MCP Server with 33 tools
+2025-07-21 10:59:35,587 - __main__ - INFO - 🚀 Starting Selenium MCP Server
+2025-07-21 10:59:35,587 - __main__ - INFO - 📋 Available tools: 33
+2025-07-21 10:59:35,587 - __main__ - INFO -   1. navigate_to: Navigate to a URL
+2025-07-21 10:59:35,587 - __main__ - INFO -   2. go_back: Go back to the previous page
+2025-07-21 10:59:35,587 - __main__ - INFO -   3. go_forward: Go forward to the next page
+2025-07-21 10:59:35,587 - __main__ - INFO -   4. capture_page: Capture DOM snapshot of the current page for element analysis
+2025-07-21 10:59:35,587 - __main__ - INFO -   5. click_element: Click on an element using its reference from page snapshot
+2025-07-21 10:59:35,587 - __main__ - INFO -   ... and 28 more tools
+2025-07-21 10:59:35,593 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 10:59:35,593 - __main__ - INFO - 📋 Listing 33 tools
+2025-07-21 10:59:35,598 - __main__ - INFO - 📋 Successfully returning 33 tools
+2025-07-21 10:59:35,599 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2025-07-21 10:59:35,599 - __main__ - INFO - 📋 Listing 33 tools
+2025-07-21 10:59:35,602 - __main__ - INFO - 📋 Successfully returning 33 tools
+2025-07-21 15:33:36,279 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 15:33:36,282 - __main__ - INFO - 🛠️ Executing tool: navigate_to
+2025-07-21 15:33:36,282 - __main__ - INFO - 📦 Created browser context
+2025-07-21 15:33:36,282 - selenium_mcp.tools.navigate - INFO - 🔍 Navigation request received: URL='https://www.parkos.nl'
+2025-07-21 15:33:36,339 - WDM - INFO - ====== WebDriver manager ======
+2025-07-21 15:33:36,547 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 15:33:36,663 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-21 15:33:36,736 - WDM - INFO - Driver [/Users/r.vanderhorst/.wdm/drivers/chromedriver/mac64/138.0.7204.157/chromedriver-mac-arm64/chromedriver] found in cache
+2025-07-21 15:33:38,155 - selenium_mcp.context - INFO - 🌐 Browser initialized
+2025-07-21 15:33:39,702 - selenium_mcp.tools.navigate - INFO - 🚀 Navigated to: https://www.parkos.nl
+2025-07-21 15:34:20,940 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 15:34:20,941 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 15:34:20,941 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Alles toestaan button', ref='e9'
+2025-07-21 15:34:20,979 - selenium_mcp.tools.snapshot - INFO - 🖱️ Clicked: Alles toestaan button
+2025-07-21 15:35:08,407 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 15:35:08,408 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 15:35:08,408 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Schiphol Airport link', ref='e21'
+2025-07-21 15:35:08,416 - selenium_mcp.context - ERROR - ❌ Tool execution failed: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//a[contains(text(), "Schiphol Airport
+vanaf € 57,00 per week")]"}
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+0   chromedriver                        0x0000000102fab55c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x0000000102fa3454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x0000000102af23f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x0000000102b3971c cxxbridge1$string$len + 382284
+4   chromedriver                        0x0000000102b7ab1c cxxbridge1$string$len + 649548
+5   chromedriver                        0x0000000102b2da0c cxxbridge1$string$len + 333884
+6   chromedriver                        0x0000000102f6e5e0 cxxbridge1$str$ptr + 2481340
+7   chromedriver                        0x0000000102f71848 cxxbridge1$str$ptr + 2494244
+8   chromedriver                        0x0000000102f4f234 cxxbridge1$str$ptr + 2353424
+9   chromedriver                        0x0000000102f72104 cxxbridge1$str$ptr + 2496480
+10  chromedriver                        0x0000000102f402e4 cxxbridge1$str$ptr + 2292160
+11  chromedriver                        0x0000000102f91ff8 cxxbridge1$str$ptr + 2627284
+12  chromedriver                        0x0000000102f92184 cxxbridge1$str$ptr + 2627680
+13  chromedriver                        0x0000000102fa3090 cxxbridge1$str$ptr + 2697068
+14  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 15:35:23,986 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 15:35:23,987 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 15:35:23,987 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Schiphol Airport link', ref='e54'
+2025-07-21 15:35:25,039 - selenium_mcp.tools.snapshot - WARNING - ⚠️ Standard click failed: Message: element click intercepted: Element is not clickable at point (660, 7396)
+  (Session info: chrome=138.0.7204.158); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementclickinterceptedexception
+Stacktrace:
+0   chromedriver                        0x0000000102fab55c cxxbridge1$str$ptr + 2731064
+1   chromedriver                        0x0000000102fa3454 cxxbridge1$str$ptr + 2698032
+2   chromedriver                        0x0000000102af23f8 cxxbridge1$string$len + 90664
+3   chromedriver                        0x0000000102b3f280 cxxbridge1$string$len + 405680
+4   chromedriver                        0x0000000102b3d7ec cxxbridge1$string$len + 398876
+5   chromedriver                        0x0000000102b3b600 cxxbridge1$string$len + 390192
+6   chromedriver                        0x0000000102b3a9fc cxxbridge1$string$len + 387116
+7   chromedriver                        0x0000000102b2f530 cxxbridge1$string$len + 340832
+8   chromedriver                        0x0000000102b2efbc cxxbridge1$string$len + 339436
+9   chromedriver                        0x0000000102b7ab1c cxxbridge1$string$len + 649548
+10  chromedriver                        0x0000000102b2da0c cxxbridge1$string$len + 333884
+11  chromedriver                        0x0000000102f6e5e0 cxxbridge1$str$ptr + 2481340
+12  chromedriver                        0x0000000102f71848 cxxbridge1$str$ptr + 2494244
+13  chromedriver                        0x0000000102f4f234 cxxbridge1$str$ptr + 2353424
+14  chromedriver                        0x0000000102f72104 cxxbridge1$str$ptr + 2496480
+15  chromedriver                        0x0000000102f402e4 cxxbridge1$str$ptr + 2292160
+16  chromedriver                        0x0000000102f91ff8 cxxbridge1$str$ptr + 2627284
+17  chromedriver                        0x0000000102f92184 cxxbridge1$str$ptr + 2627680
+18  chromedriver                        0x0000000102fa3090 cxxbridge1$str$ptr + 2697068
+19  libsystem_pthread.dylib             0x000000019ef69c0c _pthread_start + 136
+20  libsystem_pthread.dylib             0x000000019ef64b80 thread_start + 8
+
+2025-07-21 15:35:25,039 - selenium_mcp.tools.snapshot - INFO - 🔄 Trying JavaScript click fallback...
+2025-07-21 15:35:26,262 - selenium_mcp.tools.snapshot - INFO - ✅ JavaScript click successful: Schiphol Airport link
+2025-07-21 15:36:07,451 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 15:36:07,453 - __main__ - INFO - 🛠️ Executing tool: click_element
+2025-07-21 15:36:07,453 - selenium_mcp.tools.snapshot - INFO - 🔍 Click params received: element='Zoek een parkeerplek button', ref='e14'
+2025-07-21 15:36:09,164 - selenium_mcp.tools.snapshot - INFO - 🖱️ Clicked: Zoek een parkeerplek button
+2025-07-21 15:36:35,282 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 15:36:35,283 - __main__ - INFO - 🛠️ Executing tool: javascript_execute
+2025-07-21 15:36:35,288 - selenium_mcp.tools.javascript - INFO - 🟡 Executed JavaScript: window.scrollTo(0, 500);...
+2025-07-21 15:37:33,035 - mcp.server.lowlevel.server - INFO - Processing request of type CallToolRequest
+2025-07-21 15:37:33,038 - __main__ - INFO - 🛠️ Executing tool: generate_script

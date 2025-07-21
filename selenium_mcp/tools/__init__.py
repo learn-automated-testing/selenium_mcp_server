@@ -19,6 +19,7 @@ from .network import NetworkTool
 from .pdf import PDFTool
 from .recording import StartRecordingTool, StopRecordingTool, RecordingStatusTool, ClearRecordingTool
 from .script_generator import GenerateScriptTool
+from .reset_session import ResetSessionTool
 
 def get_all_tools():
     """Get all available tools."""
@@ -86,4 +87,7 @@ def get_all_tools():
         RecordingStatusTool(),
         ClearRecordingTool(),
         GenerateScriptTool(),
+        
+        # Session management
+        ResetSessionTool(),
     ]

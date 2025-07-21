@@ -101,11 +101,20 @@ class BrowserManager:
             from selenium.webdriver.chrome.service import Service
             
             options = Options()
+            # Essential stability options
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--disable-features=VizDisplayCompositor")
+            options.add_argument("--disable-web-security")
+            
+            # Prevent detection
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option('useAutomationExtension', False)
+            
+            # macOS specific fixes
+            options.add_argument("--remote-debugging-port=0")  # Avoid port conflicts
             
             try:
                 service = Service(ChromeDriverManager().install())
@@ -262,23 +271,51 @@ class Context:
             if result.action:
                 action_result = await result.action()
                 
-                # Capture snapshot after action if requested
+                # Capture snapshot after action if requested (like playwright-mcp)
                 if result.capture_snapshot:
                     await self.capture_snapshot()
                 
-                # Special handling for snapshot tool to return YAML format
-                if tool.schema.name == "capture_page" and action_result.get("snapshot"):
-                    return {
-                        "text": action_result["snapshot"],  # Return YAML directly
-                        "code": result.code,
-                        "action_result": action_result
-                    }
-                else:
-                    return {
-                        "text": f"✅ {tool.schema.name} executed successfully",
-                        "code": result.code,
-                        "action_result": action_result
-                    }
+                # Build response with automatic snapshot inclusion (like playwright-mcp)
+                response_lines = []
+                
+                # Add tool execution confirmation
+                response_lines.append(f"### Ran Selenium automation")
+                response_lines.append("```python")
+                for code_line in result.code:
+                    response_lines.append(code_line)
+                response_lines.append("```")
+                
+                # Add page snapshot if captured (like playwright-mcp)
+                if result.capture_snapshot and self.current_snapshot:
+                    response_lines.append("")
+                    response_lines.append("### Page state")
+                    response_lines.append(f"- Page URL: {self.current_snapshot.url}")
+                    response_lines.append(f"- Page Title: {self.current_snapshot.title}")
+                    response_lines.append("- Page Snapshot:")
+                    response_lines.append("```yaml")
+                    
+                    # Build accessibility tree
+                    for ref, element in self.current_snapshot.elements.items():
+                        element_line = f"- {element.tag_name}"
+                        if element.text:
+                            element_line += f' "{element.text}"'
+                        
+                        props = [f"[ref={ref}]"]
+                        if element.attributes.get("role"):
+                            props.append(f'[role={element.attributes["role"]}]')
+                        if not element.is_clickable:
+                            props.append("[disabled]")
+                        
+                        element_line += " " + " ".join(props)
+                        response_lines.append(element_line)
+                    
+                    response_lines.append("```")
+                
+                return {
+                    "text": "\n".join(response_lines),
+                    "code": result.code,
+                    "action_result": action_result
+                }
             else:
                 return {
                     "text": f"✅ {tool.schema.name} prepared", 

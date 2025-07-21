@@ -2,7 +2,9 @@
   "mcpServers": {
     "selenium-mcp": {
       "command": "/Users/r.vanderhorst/develop/selenium_mcp_server/venv/bin/python",
-      "args": ["./mcp_server.py"],
+      "args": [
+        "mcp_server.py"
+      ],
       "cwd": "/Users/r.vanderhorst/develop/selenium_mcp_server"
     }
   }

@@ -156,7 +156,7 @@ class ClickTool(BaseTool):
         return ToolResult(
             code=code,
             action=click_action,
-            capture_snapshot=True,
+            capture_snapshot=True,  # Auto-capture like playwright-mcp
             wait_for_network=True
         )
 

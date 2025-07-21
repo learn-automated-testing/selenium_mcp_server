@@ -34,11 +34,27 @@ class NavigateTool(BaseTool):
     async def handle(self, context: Context, params: NavigateParams) -> ToolResult:
         """Navigate to URL."""
         
+        # Debug: Log the received URL
+        logger.info(f"🔍 Navigation request received: URL='{params.url}'")
+        
+        if not params.url or params.url.strip() == "":
+            logger.error("❌ Empty URL received")
+            raise ValueError("URL parameter is required and cannot be empty")
+        
         # Navigation action
         async def navigate_action():
             driver = await context.ensure_browser()
-            driver.get(params.url)
-            logger.info(f"🚀 Navigated to: {params.url}")
+            # Set page load timeout to prevent hanging
+            driver.set_page_load_timeout(30)
+            
+            try:
+                driver.get(params.url)
+                logger.info(f"🚀 Navigated to: {params.url}")
+            except Exception as e:
+                # If page load times out, continue anyway
+                logger.warning(f"⚠️ Page load timeout for {params.url}, continuing anyway")
+                # Execute JavaScript to stop loading
+                driver.execute_script("window.stop();")
         
         # Robot Framework code
         code = [
@@ -49,7 +65,7 @@ class NavigateTool(BaseTool):
         return ToolResult(
             code=code,
             action=navigate_action,
-            capture_snapshot=True,
+            capture_snapshot=True,  # Auto-capture like playwright-mcp
             wait_for_network=True
         )
 
