@@ -5,7 +5,7 @@
 First, make sure you have the required Python packages:
 
 ```bash
-cd /Users/r.vanderhorst/develop/robot_framework_mcp
+cd /Users/users/robot_framework_mcp
 pip install -r requirements.txt
 ```
 
@@ -142,10 +142,7 @@ Once installed, you can ask Cursor to:
 
 You can test the server directly:
 
-```bash
-cd /Users/r.vanderhorst/develop/robot_framework_mcp
-python mcp_server.py
-```
+
 
 Then send MCP protocol messages to test functionality.
 

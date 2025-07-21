@@ -43,7 +43,49 @@ class SnapshotTool(BaseTool):
             if context.current_snapshot:
                 element_count = len(context.current_snapshot.elements)
                 logger.info(f"📸 Captured snapshot with {element_count} elements")
-                return {"element_count": element_count, "snapshot_id": id(context.current_snapshot)}
+                
+                # Generate YAML accessibility tree like playwright-mcp
+                yaml_lines = []
+                yaml_lines.append("### Page state")
+                yaml_lines.append(f"- Page URL: {context.current_snapshot.url}")
+                yaml_lines.append(f"- Page Title: {context.current_snapshot.title}")
+                yaml_lines.append("- Page Snapshot:")
+                yaml_lines.append("```yaml")
+                
+                # Build accessibility tree in YAML format
+                for ref, element in context.current_snapshot.elements.items():
+                    # Format element like playwright-mcp
+                    element_line = f"- {element.tag_name}"
+                    
+                    # Add text in quotes if present
+                    if element.text:
+                        element_line += f' "{element.text}"'
+                    
+                    # Add properties in brackets
+                    props = []
+                    props.append(f"[ref={ref}]")
+                    
+                    if element.attributes.get("role"):
+                        props.append(f'[role={element.attributes["role"]}]')
+                    
+                    if not element.is_clickable:
+                        props.append("[disabled]")
+                    
+                    # Special handling for specific elements
+                    if element.tag_name == "h1":
+                        props.append("[level=1]")
+                    elif element.tag_name == "h2":
+                        props.append("[level=2]")
+                    elif element.tag_name == "h3":
+                        props.append("[level=3]")
+                    
+                    element_line += " " + " ".join(props)
+                    yaml_lines.append(element_line)
+                
+                yaml_lines.append("```")
+                
+                # Return the YAML format that Cursor expects
+                return {"snapshot": "\n".join(yaml_lines)}
             else:
                 logger.error("❌ Failed to capture snapshot")
                 return {"error": "Snapshot capture failed"}
@@ -74,6 +116,9 @@ class ClickTool(BaseTool):
     
     async def handle(self, context: Context, params: ClickParams) -> ToolResult:
         """Click element - matches playwright-mcp click handle exactly."""
+        # Debug what Cursor is sending
+        logger.info(f"🔍 Click params received: element='{params.element}', ref='{params.ref}'")
+        
         # Get current driver and snapshot
         driver = context.current_tab_or_die()
         snapshot = context.snapshot_or_die()

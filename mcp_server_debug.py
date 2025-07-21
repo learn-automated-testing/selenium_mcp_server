@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Selenium MCP Server - Pure MCP implementation for browser automation."""
+"""Selenium MCP Server with file-based logging for debugging."""
 
 import asyncio
 import logging
@@ -19,10 +19,10 @@ from mcp.types import TextContent, Tool
 from selenium_mcp.context import Context
 from selenium_mcp.tools import get_all_tools
 
-# Configure logging to file only (not stdout/stderr which interferes with MCP)
-log_file = Path(__file__).parent / "mcp_server.log"
+# Configure logging to file only (not stdout/stderr)
+log_file = Path(__file__).parent / "mcp_debug.log"
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(log_file),
@@ -37,29 +37,17 @@ app = Server("selenium-mcp")
 try:
     tools = get_all_tools()
     logger.info(f"🚀 Successfully loaded {len(tools)} tools")
-    for i, tool in enumerate(tools[:5]):
-        logger.info(f"  {i+1}. {tool.schema.name}")
-    if len(tools) > 5:
-        logger.info(f"  ... and {len(tools) - 5} more tools")
 except Exception as e:
     logger.error(f"❌ Failed to load tools: {e}")
-    import traceback
-    logger.error(traceback.format_exc())
     tools = []
 
 context: Optional[Context] = None
-
-logger.info(f"🚀 Initializing Selenium MCP Server with {len(tools)} tools")
 
 @app.list_tools()
 async def handle_list_tools() -> List[Tool]:
     """List available browser automation tools."""
     try:
-        logger.info(f"📋 Listing {len(tools)} tools")
-        
-        if not tools:
-            logger.error("❌ No tools found! Tools list is empty.")
-            return []
+        logger.info(f"📋 list_tools called - returning {len(tools)} tools")
         
         mcp_tools = []
         for tool in tools:
@@ -70,11 +58,10 @@ async def handle_list_tools() -> List[Tool]:
                     inputSchema=tool.schema.input_schema_dict
                 )
                 mcp_tools.append(mcp_tool)
-                logger.debug(f"✅ Added tool: {tool.schema.name}")
             except Exception as e:
                 logger.error(f"❌ Failed to add tool {tool.schema.name}: {e}")
         
-        logger.info(f"📋 Successfully returning {len(mcp_tools)} tools")
+        logger.info(f"📋 Successfully created {len(mcp_tools)} MCP tools")
         return mcp_tools
         
     except Exception as e:
@@ -114,16 +101,9 @@ async def handle_call_tool(name: str, arguments: Optional[Dict[str, Any]] = None
 
 async def main():
     """Main server entry point."""
-    logger.info("🚀 Starting Selenium MCP Server")
+    logger.info("🚀 Starting Selenium MCP Server (debug mode)")
     logger.info(f"📋 Available tools: {len(tools)}")
-    
-    # List first few tools for confirmation
-    for i, tool in enumerate(tools[:5]):
-        logger.info(f"  {i+1}. {tool.schema.name}: {tool.schema.description}")
-    
-    if len(tools) > 5:
-        logger.info(f"  ... and {len(tools) - 5} more tools")
-    
+    logger.info(f"📝 Logging to: {log_file}")
     
     async with stdio_server() as (read_stream, write_stream):
         await app.run(
@@ -133,7 +113,7 @@ async def main():
                 server_name="selenium-mcp",
                 server_version="0.1.0",
                 capabilities={
-                    "tools": {}  # Explicitly declare tools capability
+                    "tools": {}
                 }
             )
         )

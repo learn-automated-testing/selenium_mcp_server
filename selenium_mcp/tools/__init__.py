@@ -17,6 +17,8 @@ from .files import FileUploadTool
 from .console import ConsoleTool
 from .network import NetworkTool
 from .pdf import PDFTool
+from .recording import StartRecordingTool, StopRecordingTool, RecordingStatusTool, ClearRecordingTool
+from .script_generator import GenerateScriptTool
 
 def get_all_tools():
     """Get all available tools."""
@@ -77,4 +79,11 @@ def get_all_tools():
         ScreenshotTool(),
         ResizeTool(),
         CloseTool(),
+        
+        # Recording and script generation
+        StartRecordingTool(),
+        StopRecordingTool(),
+        RecordingStatusTool(),
+        ClearRecordingTool(),
+        GenerateScriptTool(),
     ]

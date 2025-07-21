@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "selenium-mcp-test": {
+      "command": "/Users/r.vanderhorst/develop/selenium_mcp_server/venv/bin/python",
+      "args": ["/Users/r.vanderhorst/develop/selenium_mcp_server/test_minimal_mcp.py"]
+    }
+  }
+}
