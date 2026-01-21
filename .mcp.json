@@ -1,10 +1,7 @@
 {
   "mcpServers": {
     "selenium-mcp": {
-      "command": "/Users/r.vanderhorst/Documents/develop/learnportal/selenium_mcp_server/venv/bin/python",
-      "args": [
-        "/Users/r.vanderhorst/Documents/develop/learnportal/selenium_mcp_server/venv/bin/selenium-mcp"
-      ]
+      "command": "selenium-mcp"
     }
   }
 }
