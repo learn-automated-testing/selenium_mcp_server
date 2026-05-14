@@ -70,6 +70,12 @@
     "yaml": "^2.8.2",
     "zod": "^3.23.0"
   },
+  "overrides": {
+    "mocha": {
+      "diff": "^8.0.3",
+      "serialize-javascript": "^7.0.5"
+    }
+  },
   "devDependencies": {
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
