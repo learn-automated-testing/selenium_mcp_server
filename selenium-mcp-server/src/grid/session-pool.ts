@@ -3,6 +3,7 @@ import { GridSessionInfo, GridSessionCapabilities, BrowserConfig } from '../type
 import { GridSession } from './grid-session.js';
 import { buildChromeOptions, applyStealthScripts } from '../utils/chrome-options.js';
 import { rewriteBidiWebSocketUrl } from '../utils/bidi-helpers.js';
+import { wrapDriverError } from '../driver-errors.js';
 
 let sessionCounter = 0;
 
@@ -44,7 +45,12 @@ export class SessionPool {
 
     builder.withCapabilities(caps);
 
-    const driver = await builder.build();
+    let driver;
+    try {
+      driver = await builder.build();
+    } catch (err) {
+      throw wrapDriverError(err, 'grid');
+    }
 
     // Always rewrite BiDi WebSocket URL for grid sessions so it routes
     // through the hub instead of the node's unreachable internal Docker IP.

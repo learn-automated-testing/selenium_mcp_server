@@ -4,6 +4,7 @@ import { discoverElements, findElementByInfo } from './utils/element-discovery.j
 import { buildChromeOptions, applyStealthScripts } from './utils/chrome-options.js';
 import { EventCollector } from './bidi/event-collector.js';
 import { SessionTracer } from './trace/session-tracer.js';
+import { wrapDriverError } from './driver-errors.js';
 
 // Forward-declared types for grid support — modules loaded dynamically via ensureGrid()
 import type { SessionPool } from './grid/session-pool.js';
@@ -282,7 +283,11 @@ export class Context {
       // Always enable BiDi WebSocket — needed for stealth, screenshots, PDF, event collection
       builder.withCapabilities({ webSocketUrl: true });
 
-      this.driver = await builder.build();
+      try {
+        this.driver = await builder.build();
+      } catch (err) {
+        throw wrapDriverError(err, 'local');
+      }
 
       if (this.config.stealth) {
         await applyStealthScripts(this.driver);
