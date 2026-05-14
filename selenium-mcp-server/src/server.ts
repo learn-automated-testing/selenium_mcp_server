@@ -12,6 +12,7 @@ import { zodToJsonSchema } from './utils/schema.js';
 import { ExpectationSchema } from './tools/base.js';
 import { Expectation } from './types.js';
 import { SessionTracer } from './trace/session-tracer.js';
+import { preflightCheck, type PreflightResult } from './preflight.js';
 
 // Pre-compute the expectation JSON schema once
 const expectationJsonSchema = zodToJsonSchema(ExpectationSchema.unwrap());
@@ -41,6 +42,9 @@ export async function createServer(externalContext?: Context) {
   if (saveTrace && !context.tracer) {
     context.tracer = new SessionTracer();
   }
+
+  // Pre-flight driver check — detect driver-acquisition issues at start-up
+  const preflight: PreflightResult = await preflightCheck();
 
   const tools = await getAllTools();
 
@@ -74,6 +78,14 @@ export async function createServer(externalContext?: Context) {
       return {
         content: [{ type: 'text', text: `Unknown tool: ${name}` }],
         isError: true
+      };
+    }
+
+    // If pre-flight failed, return the error for every tool call
+    if (!preflight.ok) {
+      return {
+        content: [{ type: 'text', text: `Pre-flight check failed:\n\n${preflight.recommendation ?? preflight.stderr ?? 'Unknown error'}` }],
+        isError: true,
       };
     }
 
