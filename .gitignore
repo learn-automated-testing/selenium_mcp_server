@@ -21,9 +21,9 @@ node_modules/
 # Environment
 .env
 
-# Local MCP config (contains absolute paths)
+# Claude Code (local tooling, hooks, settings)
+.claude/
 .mcp.json
-.claude/mcp.json
 
 # Temp/test directories
 tesat/
