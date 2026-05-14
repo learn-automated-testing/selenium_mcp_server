@@ -2,7 +2,7 @@
 id: US-002
 epic: EPIC-017-driver-error-diagnostics
 priority: must-have
-status: done
+status: draft
 testing: [unit]
 ---
 

@@ -1,6 +1,6 @@
 # PRD-005 — Robust Driver Acquisition
 
-> **Status:** done (2026-05-14)
+> **Status:** draft (2026-05-14)
 > **Owner:** dev-team
 > **Reviewers:** —
 > **Source material:** `selenium-mcp-server/src/context.ts`, `selenium-mcp-server/src/tools/base.ts`

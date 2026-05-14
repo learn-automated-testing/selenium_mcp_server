@@ -2,7 +2,7 @@
 id: US-003
 epic: EPIC-016-preflight-driver-check
 priority: should-have
-status: done
+status: draft
 testing: [unit]
 ---
 

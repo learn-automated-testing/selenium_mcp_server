@@ -1,6 +1,6 @@
 # EPIC-016 — Pre-flight Driver Check
 
-> **Status:** done (2026-05-14)
+> **Status:** draft (2026-05-14)
 > **Owner:** dev-team
 > **Reviewers:** —
 > **Source document:** [PRD-005 — Robust Driver Acquisition](../PRD-005-robust-driver-acquisition.md)
