@@ -59,7 +59,7 @@ const runTestsSchema = z.object({
   args: z.array(z.string()).optional().describe('Command arguments. If omitted, reads from .test-manifest.json.'),
   cwd: z.string().optional().describe('Working directory (project root). If omitted, reads from .test-manifest.json.'),
   testPath: z.string().optional().describe('Path to test file. Used to locate .test-manifest.json if command/args are not provided. Also appended as --spec arg for wdio.'),
-  timeout: z.number().optional().default(120000).describe('Timeout in milliseconds (default: 120000)')
+  timeout: z.coerce.number().optional().default(120000).describe('Timeout in milliseconds (default: 120000)')
 });
 
 export class HealerRunTestsTool extends BaseTool {
@@ -170,7 +170,7 @@ const debugTestSchema = z.object({
   args: z.array(z.string()).optional().describe('Command arguments. If omitted, reads from .test-manifest.json.'),
   cwd: z.string().optional().describe('Working directory (project root). If omitted, reads from .test-manifest.json.'),
   testPath: z.string().optional().describe('Path to test file. Used to locate .test-manifest.json if command/args are not provided.'),
-  timeout: z.number().optional().default(120000).describe('Timeout in milliseconds (default: 120000)')
+  timeout: z.coerce.number().optional().default(120000).describe('Timeout in milliseconds (default: 120000)')
 });
 
 export class HealerDebugTestTool extends BaseTool {
@@ -324,7 +324,10 @@ export class BrowserGenerateLocatorTool extends BaseTool {
     await context.captureSnapshot();
     const snapshot = await context.getSnapshot();
 
-    const matchingElements: Array<{ ref: string; tag: string; text: string; id?: string }> = [];
+    const matchingElements: Array<{
+      ref: string; tag: string; text: string;
+      id?: string; name?: string; css?: string; xpath?: string;
+    }> = [];
 
     for (const [ref, elem] of snapshot.elements) {
       const text = elem.text?.toLowerCase() || '';
@@ -337,20 +340,33 @@ export class BrowserGenerateLocatorTool extends BaseTool {
           tag: elem.tagName,
           text: elem.text || '',
           id: elem.attributes['id'],
+          name: elem.attributes['name'],
+          css: elem.css,
+          xpath: elem.xpath,
         });
       }
     }
 
     if (matchingElements.length > 0) {
       const best = matchingElements[0];
+      const locators: string[] = [];
+
+      // Prefer precomputed CSS selector
+      if (best.css) locators.push(`By.css("${best.css}")`);
+      // Then specific strategies
+      if (best.id) locators.push(`By.id("${best.id}")`);
+      if (best.name) locators.push(`By.name("${best.name}")`);
+      // XPath fallback
+      if (best.xpath) {
+        locators.push(`By.xpath("${best.xpath}")`);
+      } else {
+        locators.push(`By.xpath("//${best.tag}[contains(text(), '${best.text.slice(0, 30)}')]")`);
+      }
+
       const result = {
         message: `Generated locator for: ${elementDescription}`,
         element: best,
-        suggestedLocators: [
-          best.id ? `By.id("${best.id}")` : null,
-          `By.xpath("//${best.tag}[contains(text(), '${best.text.slice(0, 30)}')]")`,
-          `[ref="${best.ref}"]`,
-        ].filter(Boolean),
+        suggestedLocators: locators,
       };
 
       return this.success(JSON.stringify(result, null, 2), false);

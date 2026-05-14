@@ -1,6 +1,6 @@
 import { Builder, WebDriver, WebElement } from 'selenium-webdriver';
 import { PageSnapshot, BrowserConfig, TabInfo, ConsoleLogEntry, SnapshotOptions, ConsoleOptions, DiffOptions } from './types.js';
-import { discoverElements, findElementByInfo } from './utils/element-discovery.js';
+import { discoverElements, findElementByInfo, formatAccessibilityTree } from './utils/element-discovery/index.js';
 import { buildChromeOptions, applyStealthScripts } from './utils/chrome-options.js';
 import { EventCollector } from './bidi/event-collector.js';
 import { SessionTracer } from './trace/session-tracer.js';
@@ -22,6 +22,8 @@ export interface ElementLocator {
   type?: string;
   placeholder?: string;
   href?: string;
+  css?: string;          // Precomputed CSS selector from element discovery
+  xpath?: string;        // XPath fallback selector
 }
 
 // Action recorded during session
@@ -213,6 +215,10 @@ export class Context {
     return this.config.outputMode ?? 'stdout';
   }
 
+  getVerboseAttributes(): boolean {
+    return this.config.verboseAttributes ?? false;
+  }
+
   setStealthEnabled(enabled: boolean): void {
     this.config.stealth = enabled;
   }
@@ -316,19 +322,32 @@ export class Context {
 
   async captureSnapshot(options?: SnapshotOptions): Promise<PageSnapshot> {
     if (this.activeGridSession) {
-      return this.activeGridSession.captureSnapshot(options);
+      return this.activeGridSession.captureSnapshot(options, this.getVerboseAttributes());
     }
 
     const driver = await this.getDriver();
 
     const url = await driver.getCurrentUrl();
     const title = await driver.getTitle();
-    const elements = await discoverElements(driver, options?.selector);
+
+    // Load selector hints for current domain+path
+    let selectorHints: Array<{ css: string; tag: string; text?: string; ariaLabel?: string }> = [];
+    try {
+      const parsedUrl = new URL(url);
+      const { loadHints, getHintsForPage } = await import('./utils/selector-hints.js');
+      const allHints = await loadHints();
+      selectorHints = getHintsForPage(allHints, parsedUrl.hostname, parsedUrl.pathname);
+    } catch {
+      // Hints loading is non-critical
+    }
+
+    const { elements, tree } = await discoverElements(driver, options?.selector, this.getVerboseAttributes(), selectorHints);
 
     this.snapshot = {
       url,
       title,
       elements,
+      tree,
       timestamp: Date.now()
     };
     return this.snapshot;
@@ -338,7 +357,7 @@ export class Context {
     if (this.activeGridSession) {
       const existing = this.activeGridSession.getSnapshot();
       if (existing) return existing;
-      return this.activeGridSession.captureSnapshot();
+      return this.activeGridSession.captureSnapshot(undefined, this.getVerboseAttributes());
     }
 
     if (!this.snapshot) {
@@ -356,19 +375,9 @@ export class Context {
       return 'No snapshot available';
     }
 
-    const lines: string[] = [
-      `Page: ${this.snapshot.title}`,
-      `URL: ${this.snapshot.url}`,
-      '',
-      'Interactive Elements:'
-    ];
-
-    for (const [ref, info] of this.snapshot.elements) {
-      const label = info.ariaLabel || info.text || info.tagName;
-      lines.push(`  [${ref}] ${info.tagName}: ${label.slice(0, 50)}`);
-    }
-
-    let text = lines.join('\n');
+    const header = `Page: ${this.snapshot.title}\nURL: ${this.snapshot.url}\n`;
+    const treeText = formatAccessibilityTree(this.snapshot.tree, { maxLength: options?.maxLength });
+    let text = header + '\n' + treeText;
 
     if (options?.maxLength && text.length > options.maxLength) {
       text = text.slice(0, options.maxLength) + '\n... (truncated)';
@@ -488,6 +497,8 @@ export class Context {
           type: info.attributes['type'] || undefined,
           placeholder: info.attributes['placeholder'] || undefined,
           href: info.attributes['href'] || undefined,
+          css: info.css || undefined,
+          xpath: info.xpath || undefined,
         };
       }
     }
@@ -538,7 +549,7 @@ export class Context {
 
   async captureSnapshotWithDiff(options?: SnapshotOptions, diffOptions?: DiffOptions): Promise<{ snapshot: string; diff: string | null }> {
     if (this.activeGridSession) {
-      await this.activeGridSession.captureSnapshot(options);
+      await this.activeGridSession.captureSnapshot(options, this.getVerboseAttributes());
       const currentText = this.activeGridSession.formatSnapshotAsText(options);
       // Grid sessions don't track previous snapshot text for diffs yet
       return { snapshot: currentText, diff: null };

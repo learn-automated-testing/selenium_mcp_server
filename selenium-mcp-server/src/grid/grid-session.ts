@@ -1,6 +1,6 @@
 import { WebDriver, WebElement } from 'selenium-webdriver';
 import { PageSnapshot, ElementInfo, GridSessionInfo, SnapshotOptions } from '../types.js';
-import { discoverElements, findElementByInfo } from '../utils/element-discovery.js';
+import { discoverElements, findElementByInfo, formatAccessibilityTree } from '../utils/element-discovery/index.js';
 
 export class GridSession {
   readonly sessionId: string;
@@ -29,12 +29,12 @@ export class GridSession {
     return this.driver;
   }
 
-  async captureSnapshot(options?: SnapshotOptions): Promise<PageSnapshot> {
+  async captureSnapshot(options?: SnapshotOptions, verboseAttributes: boolean = false): Promise<PageSnapshot> {
     const url = await this.driver.getCurrentUrl();
     const title = await this.driver.getTitle();
-    const elements = await discoverElements(this.driver, options?.selector);
+    const { elements, tree } = await discoverElements(this.driver, options?.selector, verboseAttributes);
 
-    this.snapshot = { url, title, elements, timestamp: Date.now() };
+    this.snapshot = { url, title, elements, tree, timestamp: Date.now() };
     return this.snapshot;
   }
 
@@ -47,19 +47,9 @@ export class GridSession {
       return 'No snapshot available';
     }
 
-    const lines: string[] = [
-      `Page: ${this.snapshot.title}`,
-      `URL: ${this.snapshot.url}`,
-      '',
-      'Interactive Elements:'
-    ];
-
-    for (const [ref, info] of this.snapshot.elements) {
-      const label = info.ariaLabel || info.text || info.tagName;
-      lines.push(`  [${ref}] ${info.tagName}: ${label.slice(0, 50)}`);
-    }
-
-    let text = lines.join('\n');
+    const header = `Page: ${this.snapshot.title}\nURL: ${this.snapshot.url}\n`;
+    const treeText = formatAccessibilityTree(this.snapshot.tree, { maxLength: options?.maxLength });
+    let text = header + '\n' + treeText;
 
     if (options?.maxLength && text.length > options.maxLength) {
       text = text.slice(0, options.maxLength) + '\n... (truncated)';

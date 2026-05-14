@@ -14,7 +14,7 @@ const schema = z.object({
   origin: z.enum(['viewport', 'document']).optional().describe('Screenshot origin: viewport (visible area, default) or document (full page)'),
   ref: z.string().optional().describe('Element ref for element screenshot (e.g. "e5")'),
   format: z.enum(['png', 'jpeg']).optional().describe('Image format (default: png)'),
-  quality: z.number().min(0).max(100).optional().describe('JPEG quality 0-100 (only for jpeg format)'),
+  quality: z.coerce.number().min(0).max(100).optional().describe('JPEG quality 0-100 (only for jpeg format)'),
 });
 
 export class ScreenshotTool extends BaseTool {
@@ -39,7 +39,7 @@ export class ScreenshotTool extends BaseTool {
       if (bidi) {
         try {
           if (ref) {
-            // Element screenshot via BiDi
+            // Element screenshot via BiDi — resolve by element ref
             const element = await context.getElementByRef(ref);
             const rect = await driver.executeScript(
               'const r = arguments[0].getBoundingClientRect(); return {x: r.x, y: r.y, width: r.width, height: r.height};',

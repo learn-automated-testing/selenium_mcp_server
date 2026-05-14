@@ -35,6 +35,7 @@ export async function createServer(externalContext?: Context) {
   const context = externalContext ?? new Context({
     stealth: process.env.SELENIUM_STEALTH === 'true',
     outputMode,
+    verboseAttributes: process.env.SELENIUM_MCP_VERBOSE_ATTRIBUTES === 'true',
   });
 
   // Enable session tracing if configured

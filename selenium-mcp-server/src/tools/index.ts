@@ -1,13 +1,13 @@
 import { BaseTool } from './base.js';
 
 // Navigation
-import { NavigateTool, GoBackTool, GoForwardTool, RefreshTool } from './navigation/index.js';
+import { NavigateTool, GoBackTool, GoForwardTool, RefreshTool, ScrollPageTool } from './navigation/index.js';
 
 // Page
 import { SnapshotTool, ScreenshotTool } from './page/index.js';
 
 // Elements
-import { ClickTool, HoverTool, SelectTool, DragDropTool } from './elements/index.js';
+import { ClickTool, HoverTool, SelectTool, DragDropTool, TeachSelectorTool } from './elements/index.js';
 
 // Input
 import { TypeTool, KeyPressTool, FileUploadTool } from './input/index.js';
@@ -95,21 +95,23 @@ export async function getAllTools(): Promise<BaseTool[]> {
   const batchTool = new BatchExecuteTool();
 
   const tools: BaseTool[] = [
-    // Navigation (4)
+    // Navigation (5)
     new NavigateTool(),
     new GoBackTool(),
     new GoForwardTool(),
     new RefreshTool(),
+    new ScrollPageTool(),
 
     // Page (2)
     new SnapshotTool(),
     new ScreenshotTool(),
 
-    // Elements (4)
+    // Elements (5)
     new ClickTool(),
     new HoverTool(),
     new SelectTool(),
     new DragDropTool(),
+    new TeachSelectorTool(),
 
     // Input (3)
     new TypeTool(),
@@ -229,6 +231,7 @@ export {
   GoBackTool,
   GoForwardTool,
   RefreshTool,
+  ScrollPageTool,
   // Page
   SnapshotTool,
   ScreenshotTool,
@@ -237,6 +240,7 @@ export {
   HoverTool,
   SelectTool,
   DragDropTool,
+  TeachSelectorTool,
   // Input
   TypeTool,
   KeyPressTool,

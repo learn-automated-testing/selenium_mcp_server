@@ -5,11 +5,15 @@ import { z } from 'zod';
 export interface ElementInfo {
   ref: string;           // e1, e2, e3...
   tagName: string;
+  role: string;
   text: string;
+  level?: number;
   ariaLabel?: string;
   isClickable: boolean;
   isVisible: boolean;
   attributes: Record<string, string>;
+  css?: string;          // Precomputed CSS selector (e.g. "#login", "input[name='email']")
+  xpath?: string;        // XPath fallback when no unique CSS exists
   boundingBox?: {
     x: number;
     y: number;
@@ -18,11 +22,23 @@ export interface ElementInfo {
   };
 }
 
+// Accessibility tree node for hierarchical page snapshot
+export interface AccessibilityNode {
+  ref?: string;
+  role: string;
+  name: string;
+  level?: number;
+  css?: string;          // Precomputed CSS selector hint for this element
+  xpath?: string;        // XPath selector when no unique CSS exists
+  children: AccessibilityNode[];
+}
+
 // Page state snapshot
 export interface PageSnapshot {
   url: string;
   title: string;
   elements: Map<string, ElementInfo>;
+  tree: AccessibilityNode;
   timestamp: number;
 }
 
@@ -101,6 +117,7 @@ export interface BrowserConfig {
   proxy?: string;
   stealth?: boolean;
   outputMode?: 'stdout' | 'file';
+  verboseAttributes?: boolean;
 }
 
 // Console log entry
