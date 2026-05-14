@@ -21,8 +21,13 @@ node_modules/
 # Environment
 .env
 
-# Claude Code (local tooling, hooks, settings)
-.claude/
+# Claude Code — local/generated files only
+.claude/settings.local.json
+.claude/state.json
+.claude/.skillsrepo.json
+.claude/plans/
+.claude/workflow-report*.html
+.claude/workflow-report-stories/
 .mcp.json
 
 # Temp/test directories
