@@ -227,6 +227,10 @@ export class Context {
     return this.driver !== null;
   }
 
+  isAttachMode(): boolean {
+    return !!process.env.SELENIUM_ATTACH_CDP;
+  }
+
   getGridUrl(): string | null {
     return process.env.SELENIUM_GRID_URL || null;
   }
@@ -280,19 +284,47 @@ export class Context {
       return this.activeGridSession.getDriver();
     }
     if (!this.driver) {
-      const options = buildChromeOptions(this.config);
+      if (this.isAttachMode()) {
+        // Attach to an already-running Chromium over CDP instead of launching one.
+        // Empirically validated on chromedriver 148: BiDi negotiates on attach, so
+        // stealth + EventCollector below work unchanged. ChromeDriver clobbers the
+        // chosen target to about:blank exactly once at session bootstrap — mitigated
+        // by the SELENIUM_TARGET_URL navigate-after-attach below.
+        const addr = process.env.SELENIUM_ATTACH_CDP!;
+        const builder = new Builder()
+          .forBrowser('chrome')
+          .withCapabilities({
+            browserName: 'chrome',
+            webSocketUrl: true,
+            'goog:chromeOptions': {
+              debuggerAddress: addr,
+              windowTypes: ['page', 'webview'],
+            },
+          });
+        try {
+          this.driver = await builder.build();
+        } catch (err) {
+          throw wrapDriverError(err, 'local');
+        }
+        const targetUrl = process.env.SELENIUM_TARGET_URL;
+        if (targetUrl) {
+          await this.driver.get(targetUrl);
+        }
+      } else {
+        const options = buildChromeOptions(this.config);
 
-      const builder = new Builder()
-        .forBrowser('chrome')
-        .setChromeOptions(options);
+        const builder = new Builder()
+          .forBrowser('chrome')
+          .setChromeOptions(options);
 
-      // Always enable BiDi WebSocket — needed for stealth, screenshots, PDF, event collection
-      builder.withCapabilities({ webSocketUrl: true });
+        // Always enable BiDi WebSocket — needed for stealth, screenshots, PDF, event collection
+        builder.withCapabilities({ webSocketUrl: true });
 
-      try {
-        this.driver = await builder.build();
-      } catch (err) {
-        throw wrapDriverError(err, 'local');
+        try {
+          this.driver = await builder.build();
+        } catch (err) {
+          throw wrapDriverError(err, 'local');
+        }
       }
 
       if (this.config.stealth) {
@@ -454,7 +486,11 @@ export class Context {
     this.eventCollector = null;
 
     if (this.driver) {
-      await this.driver.quit();
+      // In attach mode, the browser is owned by an external process (e.g. Studio).
+      // Calling driver.quit() would close it — drop the reference instead.
+      if (!this.isAttachMode()) {
+        await this.driver.quit();
+      }
       this.driver = null;
       this.snapshot = null;
       this.consoleLogs = [];
