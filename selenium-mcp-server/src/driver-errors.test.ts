@@ -1,7 +1,5 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import sinon from 'sinon';
-import os from 'node:os';
 import {
   classifyDriverError,
   getDiagnosticCommand,
@@ -45,29 +43,18 @@ describe('classifyDriverError', () => {
 });
 
 describe('getDiagnosticCommand', () => {
-  afterEach(() => {
-    sinon.restore();
+  it('should quote an injected manager path and append the debug flags', () => {
+    const cmd = getDiagnosticCommand('/opt/sw/bin/macos/selenium-manager');
+    expect(cmd).to.equal('"/opt/sw/bin/macos/selenium-manager" --browser chrome --debug');
   });
 
-  it('should return macOS path on darwin', () => {
-    sinon.stub(os, 'platform').returns('darwin');
+  it('should reference the actually-resolved selenium-manager path by default', () => {
     const cmd = getDiagnosticCommand();
-    expect(cmd).to.include('bin/macos/selenium-manager');
+    expect(cmd).to.include('selenium-manager');
+    expect(cmd).to.include('selenium-webdriver');
     expect(cmd).to.include('--browser chrome --debug');
-  });
-
-  it('should return Windows path on win32', () => {
-    sinon.stub(os, 'platform').returns('win32');
-    const cmd = getDiagnosticCommand();
-    expect(cmd).to.include('bin\\windows\\selenium-manager.exe');
-    expect(cmd).to.include('--browser chrome --debug');
-  });
-
-  it('should return Linux path on linux', () => {
-    sinon.stub(os, 'platform').returns('linux');
-    const cmd = getDiagnosticCommand();
-    expect(cmd).to.include('bin/linux/selenium-manager');
-    expect(cmd).to.include('--browser chrome --debug');
+    // Never the old root-anchored guess.
+    expect(cmd.startsWith('"/node_modules/')).to.equal(false);
   });
 });
 

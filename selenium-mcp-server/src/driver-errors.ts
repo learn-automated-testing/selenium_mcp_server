@@ -1,4 +1,5 @@
-import { platform } from 'node:os';
+import { join } from 'node:path';
+import { inspectSeleniumManager, seleniumManagerRelativePath } from './driver-provision.js';
 
 export type ErrorCategory =
   | 'NETWORK_UNREACHABLE'
@@ -56,16 +57,13 @@ export function classifyDriverError(errorText: string): ErrorCategory {
   return 'UNKNOWN';
 }
 
-export function getDiagnosticCommand(): string {
-  const plat = platform();
-  switch (plat) {
-    case 'darwin':
-      return './node_modules/selenium-webdriver/bin/macos/selenium-manager --browser chrome --debug';
-    case 'win32':
-      return '.\\node_modules\\selenium-webdriver\\bin\\windows\\selenium-manager.exe --browser chrome --debug';
-    default:
-      return './node_modules/selenium-webdriver/bin/linux/selenium-manager --browser chrome --debug';
-  }
+export function getDiagnosticCommand(managerPath?: string): string {
+  // Point at the actually-resolved Selenium Manager (works under npx/global/
+  // local). Fall back to a relative best-guess only if it cannot be resolved.
+  const resolved = managerPath
+    ?? inspectSeleniumManager().path
+    ?? join('node_modules', 'selenium-webdriver', seleniumManagerRelativePath());
+  return `"${resolved}" --browser chrome --debug`;
 }
 
 const REMEDIATION: Record<ErrorCategory, (original: string) => string> = {

@@ -14,6 +14,10 @@ import {
   getSeleniumCacheDir,
   detectChromeVersion,
   resolveDriver,
+  seleniumManagerRelativePath,
+  getSeleniumManagerPath,
+  getSeleniumWebdriverDir,
+  resolveSeleniumManager,
   type ResolveDeps,
   type ChromeInfo,
 } from './driver-provision.js';
@@ -144,6 +148,64 @@ describe('driver-provision', () => {
       execStub.throws(new Error('ENOENT'));
 
       expect(detectChromeVersion()).to.equal(null);
+    });
+  });
+
+  describe('seleniumManagerRelativePath', () => {
+    it('should use the macos binary on darwin', () => {
+      expect(seleniumManagerRelativePath('darwin')).to.equal('bin/macos/selenium-manager');
+    });
+
+    it('should use the windows .exe binary on win32', () => {
+      expect(seleniumManagerRelativePath('win32')).to.equal('bin/windows/selenium-manager.exe');
+    });
+
+    it('should use the linux binary on linux', () => {
+      expect(seleniumManagerRelativePath('linux')).to.equal('bin/linux/selenium-manager');
+    });
+  });
+
+  describe('getSeleniumManagerPath', () => {
+    it('should join the injected base dir with the macOS sub-path', () => {
+      const p = getSeleniumManagerPath('darwin', '/fake/selenium-webdriver').replace(/\\/g, '/');
+      expect(p).to.equal('/fake/selenium-webdriver/bin/macos/selenium-manager');
+    });
+
+    it('should append .exe under the windows sub-path', () => {
+      const p = getSeleniumManagerPath('win32', '/fake/selenium-webdriver').replace(/\\/g, '/');
+      expect(p).to.equal('/fake/selenium-webdriver/bin/windows/selenium-manager.exe');
+    });
+
+    it('should join the injected base dir with the linux sub-path', () => {
+      const p = getSeleniumManagerPath('linux', '/fake/selenium-webdriver').replace(/\\/g, '/');
+      expect(p).to.equal('/fake/selenium-webdriver/bin/linux/selenium-manager');
+    });
+
+    it('should default the base to the real selenium-webdriver install (not cwd)', () => {
+      // The real package is resolvable in this repo; the path must live under it,
+      // never starting from the filesystem root as the old cwd-based lookup did.
+      const dir = getSeleniumWebdriverDir().replace(/\\/g, '/');
+      expect(dir).to.include('selenium-webdriver');
+      const p = getSeleniumManagerPath().replace(/\\/g, '/');
+      expect(p.startsWith(dir)).to.equal(true);
+      expect(p.startsWith('/node_modules/')).to.equal(false);
+    });
+  });
+
+  describe('resolveSeleniumManager', () => {
+    it('should throw with the attempted path and a hint when the binary is missing', () => {
+      sinon.stub(fs, 'existsSync').returns(false);
+
+      let thrown: Error | null = null;
+      try {
+        resolveSeleniumManager();
+      } catch (err) {
+        thrown = err as Error;
+      }
+
+      expect(thrown).to.not.equal(null);
+      expect(thrown!.message).to.include('Selenium Manager binary not found at:');
+      expect(thrown!.message.toLowerCase()).to.include('reinstall');
     });
   });
 

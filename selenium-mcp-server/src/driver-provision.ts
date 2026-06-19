@@ -1,8 +1,14 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, statSync, readdirSync, rmSync } from 'node:fs';
-import { join, resolve, dirname } from 'node:path';
+import { join, dirname } from 'node:path';
 import { homedir, platform } from 'node:os';
+import { createRequire } from 'node:module';
 import { loadProxyConfig, buildSubprocessEnv } from './proxy-config.js';
+
+// Resolve dependencies relative to THIS module's real location, so the bundled
+// selenium-webdriver is found regardless of cwd (the previous cwd-based lookup
+// broke under npx, where selenium-webdriver lives in the npx cache).
+const requireFromHere = createRequire(import.meta.url);
 
 /** Installed Chrome browser, as far as it could be detected. */
 export interface ChromeInfo {
@@ -158,29 +164,95 @@ export function removeCacheEntry(driverPath: string): void {
 // Selenium Manager invocation
 // ---------------------------------------------------------------------------
 
-/** Locate the bundled Selenium Manager binary inside selenium-webdriver. */
-export function getSeleniumManagerPath(): string {
-  const plat = platform();
-  let relative: string;
+/** Relative path to the Selenium Manager binary for a given platform. */
+export function seleniumManagerRelativePath(plat: NodeJS.Platform = platform()): string {
   switch (plat) {
     case 'darwin':
-      relative = 'bin/macos/selenium-manager';
-      break;
+      return 'bin/macos/selenium-manager';
     case 'win32':
-      relative = 'bin/windows/selenium-manager.exe';
-      break;
+      return 'bin/windows/selenium-manager.exe';
     default:
-      relative = 'bin/linux/selenium-manager';
-      break;
+      return 'bin/linux/selenium-manager';
+  }
+}
+
+/**
+ * The directory where selenium-webdriver is actually installed, via Node's
+ * module resolution from this module. Works under npx, global and local
+ * installs alike. Throws if selenium-webdriver cannot be resolved.
+ */
+export function getSeleniumWebdriverDir(): string {
+  return dirname(requireFromHere.resolve('selenium-webdriver/package.json'));
+}
+
+/**
+ * Build the Selenium Manager path. Both inputs are injectable for testing the
+ * cross-platform logic without the other platforms' binaries being present.
+ */
+export function getSeleniumManagerPath(
+  plat: NodeJS.Platform = platform(),
+  baseDir: string = getSeleniumWebdriverDir(),
+): string {
+  return join(baseDir, seleniumManagerRelativePath(plat));
+}
+
+/** Non-throwing inspection of the Selenium Manager binary, for diagnostics. */
+export function inspectSeleniumManager(): { path: string | null; exists: boolean; executable: boolean } {
+  let path: string;
+  try {
+    path = getSeleniumManagerPath();
+  } catch {
+    // selenium-webdriver itself could not be resolved.
+    return { path: null, exists: false, executable: false };
+  }
+  const exists = existsSync(path);
+  return { path, exists, executable: exists && isExecutableFile(path) };
+}
+
+/** True if the path is a non-empty file that the OS can execute. */
+function isExecutableFile(path: string): boolean {
+  let stat;
+  try {
+    stat = statSync(path);
+  } catch {
+    return false;
+  }
+  if (!stat.isFile() || stat.size === 0) return false;
+  if (platform() === 'win32') return path.toLowerCase().endsWith('.exe');
+  return (stat.mode & 0o111) !== 0;
+}
+
+/**
+ * Resolve the Selenium Manager binary and verify it exists and is executable.
+ * @throws with the attempted path and a remediation hint otherwise.
+ */
+export function resolveSeleniumManager(): string {
+  let path: string;
+  try {
+    path = getSeleniumManagerPath();
+  } catch (err) {
+    throw new Error(
+      `Could not locate the selenium-webdriver package: ${(err as Error).message}\n`
+      + 'selenium-webdriver appears to be missing — reinstall it (npm install selenium-webdriver).',
+    );
   }
 
-  try {
-    const resolved = join(resolve('node_modules', 'selenium-webdriver'), relative);
-    if (existsSync(resolved)) return resolved;
-  } catch {
-    /* fall through */
+  if (!existsSync(path)) {
+    throw new Error(
+      `Selenium Manager binary not found at: ${path}\n`
+      + 'selenium-webdriver is missing or incompletely installed — reinstall it '
+      + '(e.g. npm install selenium-webdriver, or clear the npx cache).',
+    );
   }
-  return join(process.cwd(), 'node_modules', 'selenium-webdriver', relative);
+
+  if (!isExecutableFile(path)) {
+    throw new Error(
+      `Selenium Manager binary at ${path} is not executable.\n`
+      + 'The selenium-webdriver install may be corrupt — reinstall it.',
+    );
+  }
+
+  return path;
 }
 
 interface ManagerOutput {
@@ -192,10 +264,7 @@ interface ManagerOutput {
  * Returns the reported driver_path. Throws with the captured stderr on failure.
  */
 function runManager(env: NodeJS.ProcessEnv, timeoutMs: number): string {
-  const binary = getSeleniumManagerPath();
-  if (!existsSync(binary)) {
-    throw new Error(`Selenium Manager binary not found at: ${binary}`);
-  }
+  const binary = resolveSeleniumManager();
 
   let stdout: string;
   try {

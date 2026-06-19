@@ -7,6 +7,7 @@ describe('doctor', () => {
   const happy: Partial<DoctorDeps> = {
     detectChrome: () => ({ version: '149.0.7827.155', major: 149 }),
     findCached: () => '/cache/chromedriver/win64/149.0.7827.155/chromedriver.exe',
+    inspectManager: () => ({ path: '/sw/bin/macos/selenium-manager', exists: true, executable: true }),
     probe: async () => true,
     proxy: undefined,
     cacheDir: '/home/u/.cache/selenium',
@@ -16,6 +17,35 @@ describe('doctor', () => {
     const report = await runDoctor(happy);
     expect(report.ok).to.equal(true);
     expect(report.checks.find((c) => c.name === 'Chrome installed')!.ok).to.equal(true);
+  });
+
+  it('should show the resolved Selenium Manager path when it is executable', async () => {
+    const report = await runDoctor(happy);
+    const mgr = report.checks.find((c) => c.name === 'Selenium Manager binary')!;
+    expect(mgr.ok).to.equal(true);
+    expect(mgr.detail).to.include('/sw/bin/macos/selenium-manager');
+  });
+
+  it('should fail the manager check with the attempted path when the binary is missing', async () => {
+    const report = await runDoctor({
+      ...happy,
+      inspectManager: () => ({ path: '/sw/bin/macos/selenium-manager', exists: false, executable: false }),
+    });
+    const mgr = report.checks.find((c) => c.name === 'Selenium Manager binary')!;
+    expect(mgr.ok).to.equal(false);
+    expect(mgr.detail).to.include('not found: /sw/bin/macos/selenium-manager');
+    expect(mgr.fix).to.be.a('string');
+    expect(report.ok).to.equal(false);
+  });
+
+  it('should fail the manager check when selenium-webdriver cannot be resolved', async () => {
+    const report = await runDoctor({
+      ...happy,
+      inspectManager: () => ({ path: null, exists: false, executable: false }),
+    });
+    const mgr = report.checks.find((c) => c.name === 'Selenium Manager binary')!;
+    expect(mgr.ok).to.equal(false);
+    expect(mgr.detail).to.include('could not be resolved');
   });
 
   it('should fail the Chrome check with a fix when Chrome is absent', async () => {

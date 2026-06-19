@@ -47,10 +47,16 @@ node dist/bin/cli.js doctor
 
 It checks, and prints a concrete fix for anything that fails:
 
+- the bundled Selenium Manager binary resolves and is executable,
 - Chrome is installed and which version,
 - an executable, matching `chromedriver` is cached and ready,
 - the download endpoint is reachable (through your proxy, if configured),
 - where the driver cache lives.
+
+> **`Selenium Manager binary not found at: /node_modules/...`?** Fixed in 3.3.1 —
+> upgrade with `npm install -g selenium-ai-agent@latest` (or clear the npx cache).
+> The binary is now resolved from the installed `selenium-webdriver` package
+> rather than the working directory, so it works under npx.
 
 ### Corporate proxy
 
