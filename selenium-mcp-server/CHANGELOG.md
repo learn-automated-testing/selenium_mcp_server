@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.3.1] - 2026-06-19
+
+### Fixes
+
+- **Selenium Manager binary not found under npx** — driver provisioning failed on first use with `Selenium Manager binary not found at: /node_modules/selenium-webdriver/bin/.../selenium-manager` (note the leading slash). The bundled binary was resolved relative to `process.cwd()` instead of the real install location, so it was never found under `npx` (where `selenium-webdriver` lives in the npx cache). It is now resolved via Node's module resolution from the installed `selenium-webdriver` package, working under npx, global and local installs alike.
+  - The platform sub-path is chosen from `process.platform` (`darwin` → `bin/macos`, `linux` → `bin/linux`, `win32` → `bin/windows/...exe`).
+  - Resolution now fails with a clear, actionable error (the attempted path plus a reinstall hint) when the binary is genuinely missing or not executable.
+  - The `doctor` command reports the resolved Selenium Manager path and whether it exists and is executable, and the diagnostic command in error messages points at the resolved path instead of a hardcoded `./node_modules/...`.
+
 ## [3.3.0] - 2026-06-19
 
 ### New Features

@@ -4,9 +4,17 @@ import {
   detectChromeVersion,
   findCachedDriver,
   getSeleniumCacheDir,
+  inspectSeleniumManager,
   type ChromeInfo,
 } from './driver-provision.js';
 import { loadProxyConfig } from './proxy-config.js';
+
+/** Outcome of inspecting the bundled Selenium Manager binary. */
+export interface ManagerInfo {
+  readonly path: string | null;
+  readonly exists: boolean;
+  readonly executable: boolean;
+}
 
 /** Result of a single doctor check. */
 export interface DoctorCheck {
@@ -26,6 +34,7 @@ export interface DoctorReport {
 export interface DoctorDeps {
   detectChrome: () => ChromeInfo | null;
   findCached: (major: number) => string | null;
+  inspectManager: () => ManagerInfo;
   probe: (host: string, port: number, timeoutMs: number) => Promise<boolean>;
   proxy?: string;
   cacheDir: string;
@@ -143,6 +152,24 @@ async function checkEndpoint(
   };
 }
 
+function checkManager(info: ManagerInfo): DoctorCheck {
+  if (info.exists && info.executable) {
+    return { name: 'Selenium Manager binary', ok: true, detail: `executable: ${info.path}` };
+  }
+  const detail = !info.path
+    ? 'selenium-webdriver could not be resolved'
+    : info.exists
+      ? `present but not executable: ${info.path}`
+      : `not found: ${info.path}`;
+  return {
+    name: 'Selenium Manager binary',
+    ok: false,
+    detail,
+    fix: 'selenium-webdriver is missing or incompletely installed — reinstall it '
+      + '(npm install selenium-webdriver). Under npx, clear the npx cache and retry.',
+  };
+}
+
 function checkCache(cacheDir: string): DoctorCheck {
   const present = existsSync(cacheDir);
   return {
@@ -156,6 +183,7 @@ function defaultDeps(): DoctorDeps {
   return {
     detectChrome: detectChromeVersion,
     findCached: (major) => findCachedDriver(major),
+    inspectManager: inspectSeleniumManager,
     probe: tcpProbe,
     proxy: loadProxyConfig().proxy,
     cacheDir: getSeleniumCacheDir(),
@@ -171,6 +199,7 @@ export async function runDoctor(deps: Partial<DoctorDeps> = {}): Promise<DoctorR
 
   const chrome = d.detectChrome();
   const checks: DoctorCheck[] = [
+    checkManager(d.inspectManager()),
     checkChrome(chrome),
     checkDriver(chrome, d.findCached),
     await checkEndpoint(d.proxy, d.probe),
