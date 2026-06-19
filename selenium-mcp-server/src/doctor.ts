@@ -3,10 +3,12 @@ import { existsSync } from 'node:fs';
 import {
   detectChromeVersion,
   findCachedDriver,
+  findChromedriverOnPath,
   getSeleniumCacheDir,
   inspectSeleniumManager,
   type ChromeInfo,
 } from './driver-provision.js';
+import { cftPlatform, buildChromedriverUrl } from './driver-download.js';
 import { loadProxyConfig } from './proxy-config.js';
 
 /** Outcome of inspecting the bundled Selenium Manager binary. */
@@ -34,6 +36,8 @@ export interface DoctorReport {
 export interface DoctorDeps {
   detectChrome: () => ChromeInfo | null;
   findCached: (major: number) => string | null;
+  findOnPath: () => string | null;
+  override: string | null;
   inspectManager: () => ManagerInfo;
   probe: (host: string, port: number, timeoutMs: number) => Promise<boolean>;
   proxy?: string;
@@ -72,84 +76,119 @@ function checkChrome(chrome: ChromeInfo | null): DoctorCheck {
   };
 }
 
-function checkDriver(chrome: ChromeInfo | null, findCached: (major: number) => string | null): DoctorCheck {
-  if (!chrome) {
-    return {
-      name: 'Matching driver ready',
-      ok: false,
-      detail: 'skipped — Chrome version unknown',
-      fix: 'Resolve the Chrome check first.',
-    };
+/**
+ * Show how the driver WOULD be provisioned (no download): the chosen strategy,
+ * the resolved/cached path, and — for the direct path — the exact storage URL.
+ * Informational: "not cached yet" is fine because the direct path downloads it.
+ */
+function checkProvisionPlan(
+  chrome: ChromeInfo | null,
+  override: string | null,
+  onPath: string | null,
+  cached: string | null,
+): DoctorCheck {
+  let strategy: string;
+  let driver: string;
+  let url: string | null = null;
+
+  if (override) {
+    strategy = 'override';
+    driver = override;
+  } else if (onPath) {
+    strategy = 'path';
+    driver = onPath;
+  } else if (cached) {
+    strategy = 'cache';
+    driver = cached;
+  } else if (chrome) {
+    const cftPlat = cftPlatform();
+    if (cftPlat) {
+      strategy = 'direct';
+      url = buildChromedriverUrl(chrome.version, cftPlat);
+      driver = '(will be downloaded to the cache)';
+    } else {
+      strategy = 'fallback';
+      driver = '(resolved by Selenium Manager)';
+    }
+  } else {
+    strategy = 'fallback';
+    driver = '(resolved by Selenium Manager)';
   }
-  const driver = findCached(chrome.major);
-  if (driver) {
-    return {
-      name: 'Matching driver ready',
-      ok: true,
-      detail: `executable chromedriver for Chrome ${chrome.major}: ${driver}`,
-    };
-  }
-  return {
-    name: 'Matching driver ready',
-    ok: false,
-    detail: `no valid cached chromedriver for Chrome ${chrome.major}`,
-    fix: 'Start the server once with network access to download it, or run the diagnostic command. '
-      + 'If your home/cache is on a shared (VMware/network) folder, point SE_CACHE_PATH at a local disk.',
-  };
+
+  const detail = [`strategy: ${strategy}`, `driver: ${driver}`, url ? `url: ${url}` : null]
+    .filter(Boolean)
+    .join('\n     ');
+
+  return { name: 'Driver provisioning plan', ok: true, detail };
 }
 
-async function checkEndpoint(
-  proxy: string | undefined,
+async function checkProxy(
+  proxy: string,
   probe: (host: string, port: number, timeoutMs: number) => Promise<boolean>,
 ): Promise<DoctorCheck> {
-  const TIMEOUT = 5_000;
-
-  if (proxy) {
-    let host: string;
-    let port: number;
-    try {
-      const url = new URL(proxy);
-      host = url.hostname;
-      port = url.port ? parseInt(url.port, 10) : url.protocol === 'https:' ? 443 : 80;
-    } catch {
-      return {
-        name: 'Download endpoint reachable',
-        ok: false,
-        detail: `configured proxy is not a valid URL: ${proxy}`,
-        fix: 'Fix the proxy URL in ~/.selenium-ai-agent/config.json or the HTTPS_PROXY env var.',
-      };
-    }
-    const ok = await probe(host, port, TIMEOUT);
-    return ok
-      ? { name: 'Download endpoint reachable', ok: true, detail: `proxy ${host}:${port} reachable` }
-      : {
-          name: 'Download endpoint reachable',
-          ok: false,
-          detail: `proxy ${host}:${port} is NOT reachable`,
-          fix: 'Check the proxy host/port and that the VPN is connected.',
-        };
-  }
-
-  const endpoints: ReadonlyArray<readonly [string, number]> = [
-    ['googlechromelabs.github.io', 443],
-    ['storage.googleapis.com', 443],
-  ];
-  const results = await Promise.all(endpoints.map(([h, p]) => probe(h, p, TIMEOUT)));
-  const unreachable = endpoints.filter((_, i) => !results[i]).map(([h]) => h);
-
-  if (unreachable.length === 0) {
+  let host: string;
+  let port: number;
+  try {
+    const url = new URL(proxy);
+    host = url.hostname;
+    port = url.port ? parseInt(url.port, 10) : url.protocol === 'https:' ? 443 : 80;
+  } catch {
     return {
-      name: 'Download endpoint reachable',
-      ok: true,
-      detail: 'googlechromelabs.github.io and storage.googleapis.com reachable',
+      name: 'Proxy reachable',
+      ok: false,
+      detail: `configured proxy is not a valid URL: ${proxy}`,
+      fix: 'Fix the proxy URL in ~/.selenium-ai-agent/config.json or the HTTPS_PROXY env var.',
     };
   }
-  return {
-    name: 'Download endpoint reachable',
-    ok: false,
-    detail: `unreachable: ${unreachable.join(', ')}`,
-    fix: 'Behind a corporate proxy? Set "proxy" in ~/.selenium-ai-agent/config.json or the HTTPS_PROXY env var.',
-  };
+  const ok = await probe(host, port, 5_000);
+  return ok
+    ? { name: 'Proxy reachable', ok: true, detail: `proxy ${host}:${port} reachable` }
+    : {
+        name: 'Proxy reachable',
+        ok: false,
+        detail: `proxy ${host}:${port} is NOT reachable`,
+        fix: 'Check the proxy host/port and that the VPN is connected.',
+      };
+}
+
+/**
+ * Per-host reachability. The storage host is required (the direct download path);
+ * the metadata host is only used by the Selenium Manager fallback, so its being
+ * unreachable is reported but never fails the report.
+ */
+async function checkHosts(
+  proxy: string | undefined,
+  probe: (host: string, port: number, timeoutMs: number) => Promise<boolean>,
+): Promise<DoctorCheck[]> {
+  if (proxy) {
+    return [await checkProxy(proxy, probe)];
+  }
+
+  const [storageOk, metadataOk] = await Promise.all([
+    probe('storage.googleapis.com', 443, 5_000),
+    probe('googlechromelabs.github.io', 443, 5_000),
+  ]);
+
+  return [
+    {
+      name: 'Storage host (driver download)',
+      ok: storageOk,
+      detail: storageOk
+        ? 'storage.googleapis.com reachable'
+        : 'storage.googleapis.com is NOT reachable',
+      fix: storageOk
+        ? undefined
+        : 'Behind a proxy? Set "proxy" in ~/.selenium-ai-agent/config.json or HTTPS_PROXY. '
+          + 'Air-gapped? Set SE_CHROMEDRIVER to a local driver or SE_CHROMEDRIVER_MIRROR to a mirror.',
+    },
+    {
+      name: 'Metadata host (fallback only)',
+      ok: true, // never gates — the direct path does not need it
+      detail: metadataOk
+        ? 'googlechromelabs.github.io reachable'
+        : 'googlechromelabs.github.io NOT reachable — fine; only the Selenium Manager fallback uses it',
+    },
+  ];
 }
 
 function checkManager(info: ManagerInfo): DoctorCheck {
@@ -183,6 +222,8 @@ function defaultDeps(): DoctorDeps {
   return {
     detectChrome: detectChromeVersion,
     findCached: (major) => findCachedDriver(major),
+    findOnPath: findChromedriverOnPath,
+    override: process.env.SE_CHROMEDRIVER?.trim() || null,
     inspectManager: inspectSeleniumManager,
     probe: tcpProbe,
     proxy: loadProxyConfig().proxy,
@@ -198,11 +239,14 @@ export async function runDoctor(deps: Partial<DoctorDeps> = {}): Promise<DoctorR
   const d: DoctorDeps = { ...defaultDeps(), ...deps };
 
   const chrome = d.detectChrome();
+  const cached = chrome ? d.findCached(chrome.major) : null;
+  const onPath = d.findOnPath();
+
   const checks: DoctorCheck[] = [
     checkManager(d.inspectManager()),
     checkChrome(chrome),
-    checkDriver(chrome, d.findCached),
-    await checkEndpoint(d.proxy, d.probe),
+    checkProvisionPlan(chrome, d.override, onPath, cached),
+    ...(await checkHosts(d.proxy, d.probe)),
     checkCache(d.cacheDir),
   ];
 

@@ -269,12 +269,19 @@ describe('driver-provision', () => {
 
   describe('resolveDriver', () => {
     const chrome: ChromeInfo = { version: '149.0.7827.155', major: 149 };
+    const DIRECT = '/cache/chromedriver/win64/149.0.7827.155/chromedriver';
+    const MANAGER = '/cache/chromedriver/linux64/149.0.7827.155/chromedriver';
 
+    // By default the network paths are disabled: direct download throws so tests
+    // exercise the fallback explicitly, and PATH/override are absent.
     function baseDeps(over: Partial<ResolveDeps>): Partial<ResolveDeps> {
       return {
         detectChrome: () => chrome,
+        findOverride: () => null,
+        findOnPath: () => null,
         findCached: () => null,
-        runManager: () => '/cache/chromedriver/linux64/149.0.7827.155/chromedriver',
+        installDirect: async () => { throw new Error('direct download disabled in test'); },
+        runManager: () => MANAGER,
         validate: () => true,
         removeEntry: () => undefined,
         sleep: async () => undefined,
@@ -282,24 +289,81 @@ describe('driver-provision', () => {
       };
     }
 
-    it('should reuse a cached driver without invoking Selenium Manager', async () => {
+    it('should use the SE_CHROMEDRIVER override without any network call', async () => {
+      const installDirect = sinon.stub().rejects(new Error('should not be called'));
       const runManager = sinon.stub().throws(new Error('should not be called'));
+
       const result = await resolveDriver({}, baseDeps({
-        findCached: () => '/cache/chromedriver/linux64/149.0.7827.155/chromedriver',
+        findOverride: () => '/opt/chromedriver',
+        installDirect,
         runManager,
       }));
 
+      expect(result.strategy).to.equal('override');
       expect(result.fromCache).to.equal(true);
+      expect(result.driverPath).to.equal('/opt/chromedriver');
+      expect(installDirect.called).to.equal(false);
       expect(runManager.called).to.equal(false);
     });
 
-    it('should resolve via Selenium Manager when no cache match exists', async () => {
-      const result = await resolveDriver({}, baseDeps({}));
-      expect(result.fromCache).to.equal(false);
-      expect(result.driverPath).to.include('chromedriver');
+    it('should use a chromedriver found on PATH without any network call', async () => {
+      const installDirect = sinon.stub().rejects(new Error('should not be called'));
+      const result = await resolveDriver({}, baseDeps({
+        findOnPath: () => '/usr/local/bin/chromedriver',
+        installDirect,
+      }));
+
+      expect(result.strategy).to.equal('path');
+      expect(installDirect.called).to.equal(false);
     });
 
-    it('should repair a corrupt entry and retry', async () => {
+    it('should reuse a cached driver without downloading', async () => {
+      const installDirect = sinon.stub().rejects(new Error('should not be called'));
+      const result = await resolveDriver({}, baseDeps({
+        findCached: () => DIRECT,
+        installDirect,
+      }));
+
+      expect(result.strategy).to.equal('cache');
+      expect(result.fromCache).to.equal(true);
+      expect(installDirect.called).to.equal(false);
+    });
+
+    it('should prefer the direct download over Selenium Manager', async () => {
+      const installDirect = sinon.stub().resolves(DIRECT);
+      const runManager = sinon.stub().throws(new Error('should not be called'));
+
+      const result = await resolveDriver({}, baseDeps({ installDirect, runManager }));
+
+      expect(result.strategy).to.equal('direct');
+      expect(result.fromCache).to.equal(false);
+      expect(result.driverPath).to.equal(DIRECT);
+      expect(runManager.called).to.equal(false);
+    });
+
+    it('should fall back to Selenium Manager when the direct download fails', async () => {
+      const installDirect = sinon.stub().rejects(new Error('No route to host'));
+      const runManager = sinon.stub().returns(MANAGER);
+
+      const result = await resolveDriver({ baseDelayMs: 0 }, baseDeps({ installDirect, runManager }));
+
+      expect(result.strategy).to.equal('fallback');
+      expect(installDirect.called).to.equal(true);
+      expect(runManager.called).to.equal(true);
+    });
+
+    it('should skip the direct download when Chrome cannot be detected', async () => {
+      const installDirect = sinon.stub().rejects(new Error('should not be called'));
+      const result = await resolveDriver({}, baseDeps({
+        detectChrome: () => null,
+        installDirect,
+      }));
+
+      expect(result.strategy).to.equal('fallback');
+      expect(installDirect.called).to.equal(false);
+    });
+
+    it('should repair a corrupt fallback entry and retry', async () => {
       const removeEntry = sinon.stub();
       const validate = sinon.stub();
       validate.onFirstCall().returns(false); // corrupt
@@ -314,11 +378,11 @@ describe('driver-provision', () => {
       expect(result.fromCache).to.equal(false);
     });
 
-    it('should retry transient download failures with backoff', async () => {
+    it('should retry transient failures with backoff', async () => {
       const sleep = sinon.stub().resolves();
       const runManager = sinon.stub();
       runManager.onFirstCall().throws(new Error('error sending request for url'));
-      runManager.onSecondCall().returns('/cache/chromedriver/linux64/149.0.7827.155/chromedriver');
+      runManager.onSecondCall().returns(MANAGER);
 
       const result = await resolveDriver({ baseDelayMs: 10 }, baseDeps({ runManager, sleep }));
 

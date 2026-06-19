@@ -49,9 +49,26 @@ It checks, and prints a concrete fix for anything that fails:
 
 - the bundled Selenium Manager binary resolves and is executable,
 - Chrome is installed and which version,
-- an executable, matching `chromedriver` is cached and ready,
-- the download endpoint is reachable (through your proxy, if configured),
+- the driver provisioning plan — strategy (override / PATH / cache / direct / fallback), the chosen download URL, and the resolved driver path,
+- per-host reachability: the **storage host** (required for the direct download) and the **metadata host** (only the Selenium Manager fallback needs it),
 - where the driver cache lives.
+
+### How the driver is obtained
+
+The driver is downloaded for your **exact** Chrome version directly from the
+Chrome-for-Testing storage host, so the metadata host
+(`googlechromelabs.github.io`) — which is unreachable on some networks (broken
+IPv6 routes → "No route to host") — is **not** on the normal path. Resolution
+order, first match wins:
+
+1. `SE_CHROMEDRIVER` — an explicit driver path (no network),
+2. a `chromedriver` already on `PATH` (no network),
+3. a cached driver matching your Chrome major (no network),
+4. **direct download** from `storage.googleapis.com` (IPv4-forced, retried),
+5. Selenium Manager discovery (fallback; uses the metadata host).
+
+For restricted / air-gapped setups, set `SE_CHROMEDRIVER` to a local driver, or
+`SE_CHROMEDRIVER_MIRROR` to a mirror of the Chrome-for-Testing storage layout.
 
 > **`Selenium Manager binary not found at: /node_modules/...`?** Fixed in 3.3.1 —
 > upgrade with `npm install -g selenium-ai-agent@latest` (or clear the npx cache).
@@ -274,6 +291,8 @@ These clients typically allow you to configure auto-approval per tool or per ser
 | `HTTPS_PROXY` / `HTTP_PROXY` | — | Proxy for the driver download (overrides the config file) |
 | `NO_PROXY` | — | Comma-separated hosts that bypass the proxy |
 | `SE_CACHE_PATH` | `~/.cache/selenium` | Driver cache directory — point at a local disk when home is a shared/network folder |
+| `SE_CHROMEDRIVER` | — | Absolute path to a chromedriver to use as-is (no network — for restricted/air-gapped setups) |
+| `SE_CHROMEDRIVER_MIRROR` | Chrome-for-Testing storage | Base URL of a mirror of the Chrome-for-Testing storage layout |
 | `SELENIUM_AI_AGENT_CONFIG` | `~/.selenium-ai-agent/config.json` | Override path to the proxy config file |
 | `SELENIUM_AI_AGENT_SKIP_PROVISION` | — | Set to `1` to skip driver provisioning and let Selenium resolve the driver itself |
 | `SELENIUM_AI_AGENT_SKIP_PREFLIGHT` | — | Set to `1` to skip the start-up driver check |
