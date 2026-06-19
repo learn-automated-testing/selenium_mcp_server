@@ -1,10 +1,12 @@
 import { Builder, WebDriver, WebElement } from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome.js';
 import { PageSnapshot, BrowserConfig, TabInfo, ConsoleLogEntry, SnapshotOptions, ConsoleOptions, DiffOptions } from './types.js';
 import { discoverElements, findElementByInfo, formatAccessibilityTree } from './utils/element-discovery/index.js';
 import { buildChromeOptions, applyStealthScripts } from './utils/chrome-options.js';
 import { EventCollector } from './bidi/event-collector.js';
 import { SessionTracer } from './trace/session-tracer.js';
 import { wrapDriverError } from './driver-errors.js';
+import { resolveDriver } from './driver-provision.js';
 
 // Forward-declared types for grid support — modules loaded dynamically via ensureGrid()
 import type { SessionPool } from './grid/session-pool.js';
@@ -284,6 +286,20 @@ export class Context {
       return this.activeGridSession.getDriver();
     }
     if (!this.driver) {
+      // Provision a verified chromedriver up-front so Selenium's .build() reuses
+      // it instead of triggering a proxy-blind auto-download. Set
+      // SELENIUM_AI_AGENT_SKIP_PROVISION=1 to fall back to Selenium's own
+      // resolution (e.g. when managing the driver manually).
+      let service: chrome.ServiceBuilder | undefined;
+      if (process.env.SELENIUM_AI_AGENT_SKIP_PROVISION !== '1') {
+        try {
+          const { driverPath } = await resolveDriver();
+          service = new chrome.ServiceBuilder(driverPath);
+        } catch (err) {
+          throw wrapDriverError(err, 'local');
+        }
+      }
+
       if (this.isAttachMode()) {
         // Attach to an already-running Chromium over CDP instead of launching one.
         // Empirically validated on chromedriver 148: BiDi negotiates on attach, so
@@ -301,6 +317,7 @@ export class Context {
               windowTypes: ['page', 'webview'],
             },
           });
+        if (service) builder.setChromeService(service);
         try {
           this.driver = await builder.build();
         } catch (err) {
@@ -316,6 +333,8 @@ export class Context {
         const builder = new Builder()
           .forBrowser('chrome')
           .setChromeOptions(options);
+
+        if (service) builder.setChromeService(service);
 
         // Always enable BiDi WebSocket — needed for stealth, screenshots, PDF, event collection
         builder.withCapabilities({ webSocketUrl: true });

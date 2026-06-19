@@ -22,7 +22,80 @@ npx selenium-ai-agent
 
 - Node.js 18+
 - Chrome browser (or Firefox/Edge)
-- ChromeDriver is automatically managed by selenium-webdriver
+- ChromeDriver is provisioned automatically — the server detects your installed
+  Chrome version, reuses a matching cached driver, and only downloads a new one
+  when the version no longer matches. Run `npx selenium-ai-agent doctor` to verify.
+
+## Driver Setup, Proxy & Troubleshooting
+
+On first use the server resolves a `chromedriver` that matches your installed
+Chrome. If that fails (corporate proxy, offline, corrupt cache), start here.
+
+### `doctor` — preflight diagnostics
+
+```bash
+npx selenium-ai-agent doctor
+```
+
+From a cloned repo (e.g. when verifying on macOS or Linux):
+
+```bash
+cd selenium-mcp-server
+npm ci && npm run build
+node dist/bin/cli.js doctor
+```
+
+It checks, and prints a concrete fix for anything that fails:
+
+- Chrome is installed and which version,
+- an executable, matching `chromedriver` is cached and ready,
+- the download endpoint is reachable (through your proxy, if configured),
+- where the driver cache lives.
+
+### Corporate proxy
+
+A GUI-launched MCP server does **not** inherit your shell's proxy. Configure it
+explicitly in one place — a JSON file in your home directory:
+
+`~/.selenium-ai-agent/config.json`
+
+```json
+{
+  "proxy": "http://user:pass@proxy.corp:8080",
+  "noProxy": "localhost,127.0.0.1,.internal"
+}
+```
+
+The standard `HTTPS_PROXY` / `HTTP_PROXY` / `NO_PROXY` environment variables are
+also honoured and take precedence over the file. The proxy is injected
+explicitly into the driver-download subprocess, so it works even when the parent
+process has no proxy in its environment. (Keep credentials in this home-dir file
+— never commit them.)
+
+### Corrupt or half-extracted cache
+
+A driver download interrupted mid-way can leave an unextracted `.zip` or a
+non-executable file in the cache, causing `EACCES` / "Exec format error". The
+server now detects this, removes just that cache entry, and re-resolves with
+exponential backoff — it never spawns a `.zip` as an executable.
+
+### Shared / network folders (VMware, mapped drives)
+
+The driver cache defaults to `~/.cache/selenium` on every platform (macOS,
+Linux and Windows alike — it is **not** `%LOCALAPPDATA%` on Windows). If your
+home directory is on a shared (VMware/HGFS) or network mount, the OS may refuse
+to execute the driver from there. Point the cache at a local disk:
+
+```bash
+# Windows
+SE_CACHE_PATH=C:\selenium-cache
+# macOS / Linux
+SE_CACHE_PATH=/var/tmp/selenium
+```
+
+> Developing on macOS but running inside a Windows VM with the Mac folders
+> shared in? Keep `SE_CACHE_PATH` on each guest's local disk so the driver is
+> never executed across the share.
 
 ## Quick Start
 
@@ -192,6 +265,13 @@ These clients typically allow you to configure auto-approval per tool or per ser
 | `SELENIUM_MCP_SAVE_TRACE` | `false` | Save session trace JSON to `<output>/traces/` |
 | `SELENIUM_MCP_UNRESTRICTED_FILES` | `false` | Bypass workspace path validation (allow writing outside output dir) |
 | `SE_AVOID_STATS` | — | Set to `true` to disable Selenium usage statistics |
+| `HTTPS_PROXY` / `HTTP_PROXY` | — | Proxy for the driver download (overrides the config file) |
+| `NO_PROXY` | — | Comma-separated hosts that bypass the proxy |
+| `SE_CACHE_PATH` | `~/.cache/selenium` | Driver cache directory — point at a local disk when home is a shared/network folder |
+| `SELENIUM_AI_AGENT_CONFIG` | `~/.selenium-ai-agent/config.json` | Override path to the proxy config file |
+| `SELENIUM_AI_AGENT_SKIP_PROVISION` | — | Set to `1` to skip driver provisioning and let Selenium resolve the driver itself |
+| `SELENIUM_AI_AGENT_SKIP_PREFLIGHT` | — | Set to `1` to skip the start-up driver check |
+| `SELENIUM_AI_AGENT_PREFLIGHT_TIMEOUT_MS` | `30000` | Timeout for the start-up driver check |
 
 Pass env vars in your MCP config:
 
@@ -215,10 +295,12 @@ Pass env vars in your MCP config:
 
 ```bash
 npx selenium-ai-agent [flags]
+npx selenium-ai-agent doctor   # run driver/proxy diagnostics and exit
 ```
 
 | Flag | Description |
 |------|-------------|
+| `doctor` | Run preflight diagnostics (Chrome, driver, proxy, cache) and exit |
 | `--stealth` | Enable stealth mode |
 | `--headless` | Run browser headless |
 | `--save-trace` | Save session trace JSON |

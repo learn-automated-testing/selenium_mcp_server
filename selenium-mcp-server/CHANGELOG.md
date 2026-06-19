@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.3.0] - 2026-06-19
+
+### New Features
+
+- **Robust driver provisioning** — the matching `chromedriver` is now resolved explicitly *before* the browser launches, instead of implicitly inside Selenium's `.build()`. The server detects the installed Chrome version, reuses a matching cached driver, and only resolves/downloads when the major version no longer matches — then hands the verified path to the `Service` so no unnecessary auto-download is triggered. Nothing is pinned; it tracks Chrome updates automatically. Skippable via `SELENIUM_AI_AGENT_SKIP_PROVISION=1`.
+
+- **Corrupt-cache recovery** — an interrupted download that leaves an unextracted `.zip` or a non-executable file is detected, the single affected cache entry is removed, and resolution is retried with exponential backoff. A `.zip` is never spawned as an executable (fixes `EACCES` / "Exec format error" on first use).
+
+- **Corporate proxy support** — proxy settings are read from one config file (`~/.selenium-ai-agent/config.json`, override via `SELENIUM_AI_AGENT_CONFIG`) and the standard `HTTPS_PROXY` / `HTTP_PROXY` / `NO_PROXY` environment variables (env takes precedence). They are injected explicitly into the driver-download subprocess, so resolution works even when a GUI-launched server does not inherit the shell's proxy.
+
+- **`doctor` command** — `npx selenium-ai-agent doctor` runs preflight diagnostics: Chrome presence and version, an executable matching driver, download-endpoint reachability (through the proxy), and the cache location — printing a concrete fix for anything that fails.
+
+### Fixes
+
+- **Driver cache directory on Windows** — Selenium's cache is `~/.cache/selenium` on every platform, not `%LOCALAPPDATA%\selenium`. The start-up preflight now targets the correct directory (the previous path meant cache recovery silently operated on the wrong folder on Windows).
+
+- **`SE_CACHE_PATH`** is now honoured for locating cached drivers, allowing the cache to be moved off a shared/network mount (e.g. a VMware-shared home folder) onto a local disk.
+
 ## [3.1.0] - 2026-03-24
 
 ### Breaking Changes

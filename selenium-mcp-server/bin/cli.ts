@@ -11,6 +11,13 @@ if (args[0] === 'install') {
   process.exit(0);
 }
 
+if (args[0] === 'doctor') {
+  const { runDoctor, formatDoctorReport } = await import('../src/doctor.js');
+  const report = await runDoctor();
+  console.log(formatDoctorReport(report));
+  process.exit(report.ok ? 0 : 1);
+}
+
 let transport = 'stdio';
 let port = 3000;
 
