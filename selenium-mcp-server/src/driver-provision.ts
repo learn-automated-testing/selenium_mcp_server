@@ -4,6 +4,7 @@ import { join, dirname } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { createRequire } from 'node:module';
 import { loadProxyConfig, buildSubprocessEnv } from './proxy-config.js';
+import { installChromedriver } from './driver-download.js';
 
 // Resolve dependencies relative to THIS module's real location, so the bundled
 // selenium-webdriver is found regardless of cwd (the previous cwd-based lookup
@@ -18,12 +19,17 @@ export interface ChromeInfo {
   readonly major: number;
 }
 
+/** Which path produced the driver. */
+export type DriverStrategy = 'override' | 'path' | 'cache' | 'direct' | 'fallback';
+
 /** Outcome of resolving a usable chromedriver. */
 export interface DriverResolution {
   /** Absolute path to a validated, executable chromedriver. */
   readonly driverPath: string;
-  /** True when reused from the cache without invoking Selenium Manager. */
+  /** True when produced without any network download (override/path/cache). */
   readonly fromCache: boolean;
+  /** How the driver was obtained. */
+  readonly strategy: DriverStrategy;
 }
 
 // ---------------------------------------------------------------------------
@@ -357,6 +363,18 @@ export function detectChromeVersion(): ChromeInfo | null {
   return { version, major };
 }
 
+/**
+ * Locate a chromedriver already on PATH (so restricted/air-gapped machines can
+ * use a pre-provisioned driver with no network call). Returns null when none.
+ */
+export function findChromedriverOnPath(): string | null {
+  const win = platform() === 'win32';
+  const out = tryCommand(win ? 'where' : 'which', [win ? 'chromedriver.exe' : 'chromedriver']);
+  if (!out) return null;
+  const first = out.split(/\r?\n/)[0]?.trim();
+  return first && isValidDriverBinary(first) ? first : null;
+}
+
 // ---------------------------------------------------------------------------
 // Orchestration
 // ---------------------------------------------------------------------------
@@ -364,7 +382,10 @@ export function detectChromeVersion(): ChromeInfo | null {
 /** Dependencies of resolveDriver, injectable for testing. */
 export interface ResolveDeps {
   detectChrome: () => ChromeInfo | null;
+  findOverride: () => string | null;
+  findOnPath: () => string | null;
   findCached: (major: number) => string | null;
+  installDirect: (version: string) => Promise<string>;
   runManager: (env: NodeJS.ProcessEnv) => string;
   validate: (path: string) => boolean;
   removeEntry: (path: string) => void;
@@ -381,7 +402,13 @@ export interface ResolveOptions {
 function defaultDeps(timeoutMs: number): ResolveDeps {
   return {
     detectChrome: detectChromeVersion,
+    findOverride: () => {
+      const p = process.env.SE_CHROMEDRIVER?.trim();
+      return p || null;
+    },
+    findOnPath: findChromedriverOnPath,
     findCached: (major) => findCachedDriver(major),
+    installDirect: (version) => installChromedriver(version),
     runManager: (env) => runManager(env, timeoutMs),
     validate: isValidDriverBinary,
     removeEntry: removeCacheEntry,
@@ -390,10 +417,15 @@ function defaultDeps(timeoutMs: number): ResolveDeps {
 }
 
 /**
- * Resolve a usable chromedriver, preferring a cached match for the installed
- * Chrome version and only invoking Selenium Manager when needed. Corrupt cache
- * entries are repaired in place; transient download failures are retried with
- * exponential backoff.
+ * Resolve a usable chromedriver. Order of preference:
+ *   1. SE_CHROMEDRIVER override path        (no network)
+ *   2. chromedriver already on PATH         (no network)
+ *   3. cached driver matching installed Chrome major (no network)
+ *   4. DIRECT download from the Chrome-for-Testing storage host, by exact
+ *      Chrome version — never touches the metadata host (the primary path)
+ *   5. Selenium Manager discovery           (fallback; uses the metadata host)
+ *
+ * Steps 4–5 retry with exponential backoff; corrupt cache entries are repaired.
  *
  * @throws when no valid driver could be produced after all retries.
  */
@@ -407,40 +439,59 @@ export async function resolveDriver(
   const baseDelay = options.baseDelayMs ?? 500;
   const env = options.env ?? buildSubprocessEnv(process.env, loadProxyConfig());
 
-  // 1. Reuse a cached driver that matches the installed Chrome major version.
+  // 1. Explicit override — restricted/air-gapped environments, no network.
+  const override = d.findOverride();
+  if (override && d.validate(override)) {
+    return { driverPath: override, fromCache: true, strategy: 'override' };
+  }
+
+  // 2. A chromedriver already on PATH — no network.
+  const onPath = d.findOnPath();
+  if (onPath && d.validate(onPath)) {
+    return { driverPath: onPath, fromCache: true, strategy: 'path' };
+  }
+
   const chrome = d.detectChrome();
+
+  // 3. Cached driver matching the installed Chrome major — no network.
   if (chrome) {
     const cached = d.findCached(chrome.major);
     if (cached) {
-      return { driverPath: cached, fromCache: true };
+      return { driverPath: cached, fromCache: true, strategy: 'cache' };
     }
   }
 
-  // 2. Resolve via Selenium Manager, with backoff + targeted corrupt-cache repair.
+  // 4 + 5. Direct download (primary), then Selenium Manager discovery (fallback).
   let lastError: Error | null = null;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     if (attempt > 0) {
       await d.sleep(baseDelay * 2 ** (attempt - 1));
     }
 
-    let driverPath: string;
+    // 4. Direct download from storage — only when the exact version is known.
+    if (chrome) {
+      try {
+        const direct = await d.installDirect(chrome.version);
+        if (d.validate(direct)) {
+          return { driverPath: direct, fromCache: false, strategy: 'direct' };
+        }
+        lastError = new Error(`downloaded driver is not a valid executable: ${direct}`);
+        try { d.removeEntry(direct); } catch { /* best effort */ }
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+      }
+    }
+
+    // 5. Fallback: Selenium Manager discovery (resolves via the metadata host).
     try {
-      driverPath = d.runManager(env);
+      const viaManager = d.runManager(env);
+      if (d.validate(viaManager)) {
+        return { driverPath: viaManager, fromCache: false, strategy: 'fallback' };
+      }
+      lastError = new Error(`resolved driver is not a valid executable: ${viaManager}`);
+      try { d.removeEntry(viaManager); } catch { /* best effort */ }
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
-      continue;
-    }
-
-    if (d.validate(driverPath)) {
-      return { driverPath, fromCache: false };
-    }
-
-    // Corrupt entry (unextracted .zip / non-executable): remove it and retry.
-    lastError = new Error(`resolved driver is not a valid executable: ${driverPath}`);
-    try {
-      d.removeEntry(driverPath);
-    } catch {
-      /* best effort */
     }
   }
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.3.2] - 2026-06-19
+
+### Fixes
+
+- **Direct chromedriver download — no metadata host on the happy path.** Provisioning now downloads chromedriver for the *exact* installed Chrome version straight from the Chrome-for-Testing storage host:
+  `https://storage.googleapis.com/chrome-for-testing-public/{version}/{platform}/chromedriver-{platform}.zip`.
+  The version-metadata host (`googlechromelabs.github.io`) — unreachable on some networks (broken IPv6 routes → "No route to host") — is no longer required. Selenium Manager discovery, which depends on that host, is now only a fallback.
+- **IPv4-forced, resilient downloads** — downloads force IPv4 (avoiding broken IPv6 routes), follow redirects and retry with exponential backoff. The zip is unpacked with a built-in `node:zlib`-based reader — no new dependency.
+
+### New Features
+
+- **Resolution order** — `SE_CHROMEDRIVER` override → chromedriver on `PATH` → cached driver → direct download → Selenium Manager fallback. The first three make no network call at all.
+- **Overrides for restricted / air-gapped environments**:
+  - `SE_CHROMEDRIVER` — absolute path to a chromedriver to use as-is (no network).
+  - `SE_CHROMEDRIVER_MIRROR` — base URL of a mirror of the Chrome-for-Testing storage layout.
+  - A chromedriver already on `PATH` or in the cache is accepted without any network call.
+- **Cross-platform** — download platform derived from `process.platform` + `process.arch`: `mac-arm64`, `mac-x64`, `linux64`, `win64`/`win32`. On macOS the driver is made executable and its `com.apple.quarantine` attribute is cleared.
+- **`doctor`** now shows the detected Chrome version, the chosen download URL, the planned strategy (override / path / cache / direct / fallback), and **per-host** reachability — the metadata host is reported but never fails the report.
+
 ## [3.3.1] - 2026-06-19
 
 ### Fixes
