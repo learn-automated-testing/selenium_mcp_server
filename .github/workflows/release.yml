@@ -186,6 +186,10 @@ jobs:
     name: Publish to npm
     runs-on: ubuntu-latest
     needs: [prepare, build, github-release]
+    # OIDC trusted publishing (same mechanism as publish-npm.yml) — no NPM_TOKEN.
+    permissions:
+      id-token: write
+      contents: read
     defaults:
       run:
         working-directory: selenium-mcp-server
@@ -199,7 +203,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
           cache-dependency-path: selenium-mcp-server/package-lock.json
@@ -211,8 +215,6 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public
 
   # ============================================
