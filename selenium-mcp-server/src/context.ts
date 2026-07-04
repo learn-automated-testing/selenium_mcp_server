@@ -285,6 +285,18 @@ export class Context {
     if (this.activeGridSession) {
       return this.activeGridSession.getDriver();
     }
+    // When SELENIUM_GRID_URL is set, route normal browsing (navigate_to,
+    // click, capture, …) to the remote grid instead of provisioning a local
+    // browser. On a server/cloud there is no local browser, so the grid is the
+    // only way these tools can run; the live session is also what powers the
+    // shared VNC viewer. Unset = local browser (desktop default), unchanged.
+    if (!this.driver && this.getGridUrl()) {
+      const { pool } = await this.ensureGrid();
+      const session = await pool.createSession({ browserName: 'chrome' });
+      this.activeGridSession = session;
+      this.activeSessionId = session.sessionId;
+      return session.getDriver();
+    }
     if (!this.driver) {
       // Provision a verified chromedriver up-front so Selenium's .build() reuses
       // it instead of triggering a proxy-blind auto-download. Set
