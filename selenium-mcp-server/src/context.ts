@@ -283,7 +283,17 @@ export class Context {
 
   async ensureBrowser(): Promise<WebDriver> {
     if (this.activeGridSession) {
-      return this.activeGridSession.getDriver();
+      // The grid reaps idle sessions, so a long-lived agent's cached session
+      // can be gone. Probe it cheaply; if it's dead, drop it and recreate below
+      // instead of failing every call with "invalid session id".
+      try {
+        const driver = this.activeGridSession.getDriver();
+        await driver.getCurrentUrl();
+        return driver;
+      } catch {
+        this.activeGridSession = null;
+        this.activeSessionId = null;
+      }
     }
     // When SELENIUM_GRID_URL is set, route normal browsing (navigate_to,
     // click, capture, …) to the remote grid instead of provisioning a local
